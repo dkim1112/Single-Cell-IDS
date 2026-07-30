@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Single-Cell IDS — how the code handles size</title>
+<style>
+  :root{
+    --bg:#f7f8fb; --ink:#1c2330; --muted:#5b6472; --line:#d3d9e3; --card:#ffffff;
+    --cells:#b45309; --cellsbg:#fff4e6; --cellsln:#f0c48a;
+    --genes:#b1275a; --genesbg:#ffe9f0; --genesln:#f2b6cc;
+    --direct:#15803d; --directbg:#e8f6ec; --directln:#a9dcb8;
+    --t1:#1d4ed8; --t1bg:#e9f0ff; --t1ln:#b6cbf5;
+    --t2:#6d28d9; --t2bg:#f1ebfd; --t2ln:#cdb8f2;
+    --engine:#0f766e; --enginebg:#e4f5f2;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;padding:32px 20px 56px}
+  .wrap{max-width:1080px;margin:0 auto}
+  h1{font-size:26px;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:15px;margin:0 0 28px}
+  h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
+    margin:34px 0 14px;border-bottom:1px solid var(--line);padding-bottom:7px}
+  .row{display:flex;gap:16px;flex-wrap:wrap}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;
+    flex:1;min-width:240px;box-shadow:0 1px 2px rgba(20,30,50,.04)}
+  .card h3{margin:0 0 6px;font-size:15px}
+  .card p{margin:6px 0 0;font-size:13.5px;color:var(--muted)}
+  .tag{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;margin-bottom:8px}
+  .grid-emoji{font-size:12px;letter-spacing:1px}
+  .explo{border-left:5px solid}
+  .c-cells{border-color:var(--cells);background:var(--cellsbg)}
+  .c-cells .tag{background:var(--cells);color:#fff}
+  .c-genes{border-color:var(--genes);background:var(--genesbg)}
+  .c-genes .tag{background:var(--genes);color:#fff}
+  code{background:#eef1f6;border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-size:12.5px}
+
+  /* pipeline flow */
+  .flow{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap;margin-top:4px}
+  .step{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px;
+    min-width:120px;display:flex;flex-direction:column;justify-content:center;text-align:center;flex:1}
+  .step .n{font-size:11px;color:var(--muted);font-weight:600}
+  .step .t{font-size:14px;font-weight:600;margin-top:2px}
+  .step .f{font-size:11.5px;color:var(--muted);margin-top:3px}
+  .arrow{align-self:center;color:var(--muted);font-size:20px;padding:0 2px}
+
+  /* three paths */
+  .paths{display:flex;gap:16px;flex-wrap:wrap;margin-top:6px}
+  .path{flex:1;min-width:250px;border-radius:12px;padding:16px 18px;border:1px solid}
+  .path h3{margin:0 0 2px;font-size:15px;display:flex;align-items:center;gap:8px}
+  .path .when{font-size:12px;font-weight:600;margin:8px 0 4px}
+  .path p{margin:4px 0 0;font-size:13px;color:var(--muted)}
+  .path .file{font-size:11.5px;margin-top:8px;color:var(--muted)}
+  .p-direct{border-color:var(--directln);background:var(--directbg)}
+  .p-direct .tag{background:var(--direct);color:#fff}
+  .p-t1{border-color:var(--t1ln);background:var(--t1bg)}
+  .p-t1 .tag{background:var(--t1);color:#fff}
+  .p-t2{border-color:var(--t2ln);background:var(--t2bg)}
+  .p-t2 .tag{background:var(--t2);color:#fff}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+
+  .converge{text-align:center;color:var(--muted);margin:16px 0 4px;font-size:13px}
+  .result{background:var(--enginebg);border:1px solid #a9ddd5;border-radius:10px;padding:12px 16px;
+    text-align:center;font-weight:600;font-size:14.5px;color:var(--engine)}
+
+  /* insets */
+  .inset{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;flex:1;min-width:300px}
+  .inset h3{margin:0 0 10px;font-size:14.5px;display:flex;align-items:center;gap:8px}
+  .mini{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+  .chip{border:1px solid var(--line);border-radius:7px;padding:6px 9px;background:#fafbfd;font-size:12px;color:var(--ink)}
+  .blk{display:inline-block;width:15px;height:15px;border-radius:3px;margin:1px}
+  .note{font-size:12.5px;color:var(--muted);margin-top:22px;border-top:1px dashed var(--line);padding-top:12px}
+  .key{font-weight:600;color:var(--ink)}
+
+  /* decode table */
+  .decode{width:100%;border-collapse:collapse;font-size:12.7px;margin-top:4px;background:#fff;
+    border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .decode th{text-align:left;background:#eef1f6;color:var(--muted);font-size:11px;letter-spacing:.05em;
+    text-transform:uppercase;padding:9px 12px;border-bottom:1px solid var(--line)}
+  .decode td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.45}
+  .decode tr:last-child td{border-bottom:none}
+  .decode .paper{color:var(--t2);font-style:italic;width:31%}
+  .decode .mean{width:34%;color:var(--ink)}
+  .decode .impl{width:35%;color:var(--muted)}
+  .decode .impl code{font-size:11.5px}
+  .decode td b{color:var(--ink)}
+  .skip{background:var(--cellsbg);border:1px solid var(--cellsln);border-radius:10px;
+    padding:12px 15px;margin-top:14px;font-size:12.7px;color:#7a4a12}
+  .skip b{color:var(--cells)}
+
+  /* walkthrough prose */
+  .walk{display:flex;flex-direction:column;gap:12px;margin-top:6px}
+  .wstep{display:flex;gap:14px;background:#fff;border:1px solid var(--line);border-radius:11px;padding:14px 16px}
+  .wnum{flex:0 0 34px;height:34px;border-radius:9px;background:#eef1f6;color:var(--ink);font-weight:700;
+    display:flex;align-items:center;justify-content:center;font-size:15px}
+  .wstep.hi .wnum{background:#efe9fb;color:var(--t2)}
+  .wbody h4{margin:0 0 4px;font-size:14.5px}
+  .wbody p{margin:0;font-size:13.4px;color:var(--muted)}
+  .wbody code{font-size:12px}
+  .routes{list-style:none;padding:0;margin:9px 0 0;display:flex;flex-direction:column;gap:6px}
+  .routes li{font-size:13px;color:var(--ink);padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:#fafbfd}
+  .routes li b{font-weight:600}
+  .rdot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:middle}
+  .filecard{background:#fff;border:1px solid var(--line);border-radius:11px;padding:15px 17px;flex:1;min-width:300px}
+  .filecard.t1{border-left:5px solid var(--t1)}
+  .filecard.t2{border-left:5px solid var(--t2)}
+  .filecard h4{margin:0 0 7px;font-size:14.5px;display:flex;align-items:center;gap:8px}
+  .filecard .tag{font-size:11px}
+  .filecard p{margin:0;font-size:13.4px;color:var(--muted)}
+  .filecard p+p{margin-top:9px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Single-Cell IDS — how the code handles size</h1>
+  <p class="sub">Data comes in as <b>cells × genes</b>. IDS expands each gene into 6 feature-columns, correlates every
+  feature pair, then squashes it back to one score per gene pair (a <b>genes × genes</b> table). Two things can get too big.</p>
+
+  <h2>The problem · two ways it blows up</h2>
+  <div class="row">
+    <div class="card explo c-cells">
+      <span class="tag">grows with CELLS</span>
+      <h3>The expanded data grid</h3>
+      <p><b>cells × (6·genes)</b>. 27M cells makes this astronomically tall. Linear in the number of cells.</p>
+    </div>
+    <div class="card explo c-genes">
+      <span class="tag">grows with GENES²</span>
+      <h3>The correlation table</h3>
+      <p><b>(6·genes) × (6·genes)</b>. 20k genes → ~120k×120k ≈ 14 billion numbers. Quadratic in genes.</p>
+    </div>
+  </div>
+
+  <h2>The pipeline · <code>sc_ids_pipeline.py</code></h2>
+  <div class="flow">
+    <div class="step"><span class="n">1 · LOAD</span><span class="t">Load data</span><span class="f">.h5ad / .csv / 10x&nbsp;folder<br>(--prefix), usually sparse</span></div>
+    <div class="arrow">→</div>
+    <div class="step"><span class="n">2 · PREP</span><span class="t">Preprocess</span><span class="f">normalize · HVG ·<br>min-max to [0,8]</span></div>
+    <div class="arrow">→</div>
+    <div class="step" style="background:#fbfaff;border-color:#d9d2f0"><span class="n">3 · CHOOSE</span><span class="t">Pick a path</span><span class="f">by data size<br>(3 options below)</span></div>
+    <div class="arrow">→</div>
+    <div class="step"><span class="n">4 · READ</span><span class="t">Extract modules</span><span class="f">threshold + find<br>gene clusters</span></div>
+  </div>
+
+  <h2>The pipeline · in words</h2>
+  <div class="walk">
+    <div class="wstep">
+      <div class="wnum">1</div>
+      <div class="wbody">
+        <h4>Load the data</h4>
+        <p>A <code>.h5ad</code>, a <code>.csv</code>, or a 10x folder — the <code>--prefix</code> flag is for GEO datasets like GSE194315 whose files are named <code>PBMC-01-1.matrix.mtx.gz</code>. Result: a <b>cells × genes</b> grid, usually stored <b>sparse</b> (mostly zeros, so only the non-zeros are kept — that's how single-cell data avoids being enormous on disk).</p>
+      </div>
+    </div>
+    <div class="wstep">
+      <div class="wnum">2</div>
+      <div class="wbody">
+        <h4>Preprocess &nbsp;<code>preprocess()</code></h4>
+        <p>Normalize each cell for its sequencing depth, optionally pick the most variable genes, and scale each gene into the <b>[0, 8]</b> range the feature map expects. It stays <b>sparse</b> here if you're using a batched path.</p>
+      </div>
+    </div>
+    <div class="wstep hi">
+      <div class="wnum">3</div>
+      <div class="wbody">
+        <h4>Choose how to compute</h4>
+        <p>This is where the two tricks live. Three routes, all returning the same <b>d × d</b> IDS table:</p>
+        <ul class="routes">
+          <li><span class="rdot" style="background:var(--direct)"></span><b>No flags</b> → hand the whole grid to <code>compute_IDS</code> in one shot (fine for small data).</li>
+          <li><span class="rdot" style="background:var(--t1)"></span><code>--block-size N</code> → <b>Trick 1</b>, gene-batching, via <code>ids_batched.py</code>.</li>
+          <li><span class="rdot" style="background:var(--t2)"></span><code>--cell-batch N</code> → <b>Trick 2 + Trick 1</b> together, via <code>ids_streaming.py</code> (for when there are too many cells).</li>
+        </ul>
+      </div>
+    </div>
+    <div class="wstep">
+      <div class="wnum">4</div>
+      <div class="wbody">
+        <h4>Extract modules &nbsp;<code>extract_modules()</code></h4>
+        <p>Take the finished IDS table, keep only the <b>strong gene-pair links</b>, and find clusters of genes that are all interlinked — those clusters are your <b>co-expression modules</b>.</p>
+      </div>
+    </div>
+  </div>
+
+  <h2>Step 3 · three paths, one identical answer</h2>
+  <div class="paths">
+    <div class="path p-direct">
+      <span class="tag">DIRECT</span>
+      <h3><span class="dot" style="background:var(--direct)"></span>Call the engine once</h3>
+      <div class="when">Use when: data fits in RAM</div>
+      <p>Hand the whole matrix to the authors' <code>compute_IDS</code>. Fastest, most precise, uses their GPU path.</p>
+      <div class="file">→ <code>ids/</code> (their code, unchanged)</div>
+    </div>
+    <div class="path p-t1">
+      <span class="tag">TRICK 1</span>
+      <h3><span class="dot" style="background:var(--t1)"></span>Batch over GENES</h3>
+      <div class="when">Use when: many genes, cells fit</div>
+      <p>Do a small block of genes at a time; stitch blocks into the full table. Tames the <b style="color:var(--genes)">genes²</b> explosion. Densifies one block at a time → also how sparse is handled.</p>
+      <div class="file">→ <code>ids_batched.py</code></div>
+    </div>
+    <div class="path p-t2">
+      <span class="tag">TRICK 2</span>
+      <h3><span class="dot" style="background:var(--t2)"></span>Batch genes + stream CELLS</h3>
+      <div class="when">Use when: too many cells for RAM</div>
+      <p>Also feed cells in slabs, in <b>two passes</b> (mean pass, then centered correlate pass — the paper's order). Tames <b style="color:var(--cells)">both</b> explosions. Plain NumPy, no p-values.</p>
+      <div class="file">→ <code>ids_streaming.py</code></div>
+    </div>
+  </div>
+  <div class="converge">↓ &nbsp; all three produce the same &nbsp; ↓</div>
+  <div class="result">genes × genes IDS table &nbsp;→&nbsp; Step 4: co-expression modules</div>
+
+  <h2>Inside the two tricks</h2>
+  <div class="row">
+    <div class="inset">
+      <h3><span class="dot" style="background:var(--t1)"></span>Trick 1 — gene blocks (<code>ids_batched.py</code>)</h3>
+      <div class="mini">
+        <span class="chip">genes split into blocks</span> →
+        <span class="chip">compute_IDS(block&nbsp;i)</span>
+        <span class="chip">compute_IDS(block&nbsp;i, block&nbsp;j)</span> →
+        <span class="chip">tile into full table</span>
+      </div>
+      <p style="font-size:12.5px;color:var(--muted);margin-top:12px">
+        Each small block is one call to <b>their</b> engine. Peak cost is one block's table, not the whole 120k×120k.</p>
+      <div style="margin-top:8px">
+        <span class="blk" style="background:var(--t1)"></span><span class="blk" style="background:#c7d6f7"></span><span class="blk" style="background:#c7d6f7"></span>
+        <span class="blk" style="background:#c7d6f7"></span><span class="blk" style="background:var(--t1)"></span><span class="blk" style="background:#c7d6f7"></span>
+        <span class="blk" style="background:#c7d6f7"></span><span class="blk" style="background:#c7d6f7"></span><span class="blk" style="background:var(--t1)"></span>
+        <span style="font-size:11.5px;color:var(--muted);margin-left:8px">one block at a time → full table</span>
+      </div>
+    </div>
+    <div class="inset">
+      <h3><span class="dot" style="background:var(--t2)"></span>Trick 2 — two passes over cell slabs (<code>ids_streaming.py</code>)</h3>
+      <div class="mini">
+        <span class="chip"><b>Pass 1</b><br>slabs → <b>means</b><br>(save to disk)</span>
+        <span class="arrow" style="font-size:16px">→</span>
+        <span class="chip"><b>Pass 2</b><br>slabs → subtract means<br>→ centered correlation</span>
+        <span class="arrow" style="font-size:16px">→</span>
+        <span class="chip">reduce → IDS</span>
+      </div>
+      <p style="font-size:12.5px;color:var(--muted);margin-top:12px">
+        Exactly the paper's order: <b>Pass 1</b> streams all cells to learn each feature's average; <b>Pass 2</b> streams
+        them again, subtracts that average (centers), and measures the relationships. Two laps, because centering safely
+        needs the true average first. Runs <b>inside</b> gene blocks, so both explosions are tamed together. (A faster
+        one-pass shortcut exists via <code>--one-pass</code>; less precise at extreme cell counts.)</p>
+    </div>
+  </div>
+
+  <h2>The two trick-files · in words</h2>
+  <div class="row">
+    <div class="filecard t1">
+      <h4><span class="tag" style="background:var(--t1);color:#fff;padding:2px 8px;border-radius:20px">TRICK 1</span> <code>ids_batched.py</code></h4>
+      <p><code>compute_IDS_blocked</code> loops over blocks of genes. For a block against itself it calls their <code>compute_IDS(block)</code>; for two different blocks it calls their <code>compute_IDS(block_i, block_j)</code>, which returns exactly the <b>cross-correlation</b> between those two gene groups. It writes each small result into the right place in the big <b>d × d</b> table.</p>
+      <p>And because it only ever handles one block at a time, the <b>sparse-to-dense conversion</b> also happens one small block at a time — that's how "handle sparse matrices" and "gene-batching" turn out to be the <b>same piece of code</b>.</p>
+    </div>
+    <div class="filecard t2">
+      <h4><span class="tag" style="background:var(--t2);color:#fff;padding:2px 8px;border-radius:20px">TRICK 2</span> <code>ids_streaming.py</code> &nbsp;<span style="font-size:12px;color:var(--muted);font-weight:400">(with Trick 1 layered in)</span></h4>
+      <p><code>compute_IDS_streaming</code> follows the paper's <b>two-pass</b> order. <b>Pass 1</b> (<code>_pass1_means</code>) streams every cell slab through the authors' feature-map (<code>transform</code> — imported, not rewritten) and accumulates only the <b>mean</b> of each feature-column (optionally saved to disk via <code>--save-means</code>). <b>Pass 2</b> (<code>_pass2_correlate</code>) streams the slabs again, <b>subtracts those saved means</b> (centers), and accumulates centered sums-of-squares (→ spreads) and centered cross-products (→ covariances), then forms the correlation and reduces to IDS.</p>
+      <p>Learning the true average <i>before</i> subtracting it is the numerically robust order — the reason the paper does two passes. A faster single-pass shortcut (raw <code>Σx·Σx²·Σxy</code> combined at the end) is still available with <code>two_pass=False</code> / <code>--one-pass</code>. It does all this <b>within gene blocks</b>, so both explosions are controlled at once.</p>
+    </div>
+  </div>
+
+  <h2>The paper's recipe · decoded line by line</h2>
+  <p class="sub" style="margin-bottom:12px">The supplementary section reads as dense math. Here is each phrase in plain words, and exactly where it lives in our code.
+  <b>k</b> = 6 features per gene · <b>n</b> = cells · <b>d</b> = genes · <b>d′</b> = genes per block · <b>n′</b> = cells per slab.</p>
+  <table class="decode">
+    <thead><tr><th class="paper">What the paper says</th><th class="mean">What it means</th><th class="impl">Where it is in our code</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="paper">"m files, each containing a matrix Xᵢ of size n × d"</td>
+        <td class="mean">The data is too big for one piece, so it arrives in chunks.</td>
+        <td class="impl">We hold one matrix and feed it in <b>cell slabs</b> instead of separate files — same idea, different packaging. <code>_iter_cell_batches()</code> in <code>ids_streaming.py</code>.</td>
+      </tr>
+      <tr>
+        <td class="paper">"center the feature-mapped variables by subtracting the mean … compute a running mean … batching over n (n′≪n) and d (d′≪d)"</td>
+        <td class="mean">A correlation needs each feature's <b>average</b>; build it up a batch at a time instead of loading everything.</td>
+        <td class="impl"><b>This is our Pass 1</b> — <code>_pass1_means()</code> streams the cells and accumulates <code>Σx</code>, giving mean = Σx ⁄ n for every feature. Can be written to disk with <code>--save-means</code>, exactly as the paper says.</td>
+      </tr>
+      <tr>
+        <td class="paper">"to avoid storing an n × kd feature-mapped matrix and the kd × kd correlation matrix, we batch over the number of variables d … generate a feature-mapped n × kd′ matrix"</td>
+        <td class="mean">Don't expand or correlate all genes at once — do a small block of genes at a time. <b>(This is Trick 1.)</b></td>
+        <td class="impl">The gene-block loop in <code>compute_IDS_blocked()</code> (<code>ids_batched.py</code>) and in <code>compute_IDS_streaming()</code> (<code>ids_streaming.py</code>).</td>
+      </tr>
+      <tr>
+        <td class="paper">"reshape to a tensor of size k × d′ × k × d′ … reduce to a d′ × d′ block by computing the ℓₚ-norm over the first and third dimensions"</td>
+        <td class="mean">Each gene pair has a 6×6 patch of feature-correlations; collapse each patch to <b>one number</b> — that's the IDS score (max, mean, or L2).</td>
+        <td class="impl">Done inside the authors' <code>compute_IDS</code> on the blocked path; replicated exactly in <code>_reduce()</code> in <code>ids_streaming.py</code>.</td>
+      </tr>
+      <tr>
+        <td class="paper">"normalize the kd′ × kd′ covariance matrix by the standard deviations … pre-compute these standard deviations"</td>
+        <td class="mean">Correlation = covariance ÷ (spread × spread). You also need each feature's <b>spread</b>, measured <b>around the mean</b> from Pass 1.</td>
+        <td class="impl"><b>This is our Pass 2</b> — <code>_pass2_correlate()</code> subtracts the Pass-1 means, then accumulates centered <code>Cxx</code> (spreads) and <code>Cxy</code> (covariances); the divide is the <code>Cxy / denom</code> line.</td>
+      </tr>
+      <tr>
+        <td class="paper">"feasible to compute IDS using O(k²d′² + nd + nkd′) memory … far smaller than O(nkd + k²d²)"</td>
+        <td class="mean">Naïve pays for the <b>whole</b> expanded grid + <b>whole</b> correlation. Batched pays only for one small block's correlation + one slab of features + the raw data.</td>
+        <td class="impl">Both tricks hit this bound: peak memory is one gene block's tally (<code>k²d′²</code>), never the full 120k×120k.</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="skip"><b>What we deliberately did NOT copy:</b> the paper's last paragraph — storing data as <b>uint16 sparse HDF5</b>, loading to <b>GPU</b> then float32, in-place ops, and <b>TensorFloat32</b> matrix multiply — is pure speed/storage tuning, not part of the correctness logic. We keep data sparse in memory (scipy) and compute in plain float64 NumPy; only the <b>Direct</b> path taps their GPU/PyTorch backend, and only if torch is installed. These are optimizations to add later if the scale ever demands them — they change the <i>speed</i>, not the <i>answer</i>.</div>
+
+  <p class="note"><span class="key">Design rule:</span> the engine's math (<code>ids/</code>, the authors' <code>compute_IDS</code> / <code>transform</code>)
+  is <span class="key">never rewritten</span>. Our files only decide <i>how</i> to feed it — whole, in gene blocks, or in gene blocks + cell slabs.
+  The <code>test_*.py</code> files prove all three routes match a single engine call to ~14 decimal places.
+  <span class="key">Pick the smallest path that fits:</span> Direct → Trick 1 → Trick 2.</p>
+</div>
+</body>
+</html>

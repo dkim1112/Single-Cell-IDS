@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 
 [project]
-name = "ids"
+name = "single-cell-ids"
 version = "0.1.0"
 dependencies = ["numpy", "tqdm"]
 authors = [
@@ -14,9 +14,16 @@ authors = [
     {name = "Eric S. Lander", email = "eric@broadinstitute.org"},
 ]
 
-description = "Library for computing InterDependence Scores (linear runtime measure of dependence)."
+description = "InterDependence Scores (IDS) with a single-cell pipeline: batched/streaming wrappers plus a scanpy-based CLI."
 license = {text = "MIT"}
 requires-python = ">=3.7"
 
 [project.optional-dependencies]
 torch = ["torch"]
+sc = ["scanpy", "anndata", "scipy"]
+
+[project.scripts]
+sc-ids = "sc_ids.pipeline:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
