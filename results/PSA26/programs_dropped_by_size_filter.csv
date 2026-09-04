@@ -1,0 +1,5 @@
+reason,n_genes,first_genes
+too_small,2,"HLA-DQA1, HLA-DQB1"
+too_large,57,"NEXN, SSX2IP, LMNA, TAGLN2"
+too_large,92,"RPL22, EFHD2, RPL11, SH3BGRL3"
+too_large,207,"RBP7, TNFRSF1B, FGR, LAPTM5"

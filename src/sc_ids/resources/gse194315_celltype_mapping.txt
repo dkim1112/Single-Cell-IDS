@@ -1,0 +1,30 @@
+ASDC	Myeloid Cell
+B intermediate	B Cell
+B memory	B Cell
+B naive	B Cell
+CD14 Mono	Myeloid Cell
+CD16 Mono	Myeloid Cell
+CD4 CTL	T Cell
+CD4 Naive	T Cell
+CD4 Proliferating	T Cell
+CD4 TCM	T Cell
+CD4 TEM	T Cell
+CD8 Naive	T Cell
+CD8 Proliferating	T Cell
+CD8 TCM	T Cell
+CD8 TEM	T Cell
+cDC1	Myeloid Cell
+cDC2	Myeloid Cell
+dnT	T Cell
+Eryth	Other
+gdT	T Cell
+HSPC	Other
+ILC	Other
+MAIT	T Cell
+NK	NK Cell
+NK_CD56bright	K Cell
+NK Proliferating	K Cell
+pDC	Myeloid Cell
+Plasmablast	Other
+Platelet	Other
+Treg	T Cell

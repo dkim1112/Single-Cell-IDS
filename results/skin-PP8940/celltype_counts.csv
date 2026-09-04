@@ -1,0 +1,27 @@
+fullsubtype,CellTypeMain,count
+Spinous Keratinocyte,Keratinocyte,26018
+Basal Keratinocyte,Keratinocyte,11715
+SFRP2+ Fibroblast,Fibroblast,7882
+Supraspinous Keratinocyte,Keratinocyte,4190
+Endothelial,Endothelial,3734
+Smooth muscle,Smooth muscle,3356
+Melanocyte,Melanocyte,1987
+Stressed T cell,T cell,1428
+Naive T cell,T cell,1154
+COL11A1+ Fibroblast,Fibroblast,1097
+cDC2B,Myeloid cell,755
+Treg,T cell,662
+Mast cell,Mast cell,563
+Cytotoxic T cell,T cell,527
+Tc17 cell,T cell,459
+LC,Myeloid cell,326
+Eccrine gland,Eccrine gland,316
+Nerve cell,Nerve cell,268
+SFRP4+ Fibroblast,Fibroblast,217
+yd T cell,T cell,168
+RAMP1+ Fibroblast,Fibroblast,131
+PVM,Myeloid cell,126
+cDC2A,Myeloid cell,87
+cDC1,Myeloid cell,84
+IFN T cell,T cell,70
+CD16+ DC,Myeloid cell,58

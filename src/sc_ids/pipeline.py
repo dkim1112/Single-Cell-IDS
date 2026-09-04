@@ -26,9 +26,14 @@ Usage
     python -m sc_ids.pipeline \
         --data data/GSE194315_PBMC-01-07_processed_data_files --prefix "PBMC-01-1." \
         --metadata data/GSE194315_CellMetadata-AS_TotalCiteseq_20220711.tsv \
-        --singlets --subset-col Subject --subset-value PSA26 \
-        --min-cells-frac 0.01 --n-hvg 1000 --min-ids 0.5 --min-size 2 --cluster greedy
-    # metadata columns available to --subset-col: Sample, Subject, Status, CellType, Cluster
+        --included-only --subset-col Subject --subset-value PSA26 \
+        --min-cells-frac 0.02 --min-ids 0.5 --min-size 2 --cluster greedy
+    # --included-only uses the SOURCE STUDY's own per-cell QC verdict
+    # (IncludedInStudy==TRUE) — preferred over --singlets, which it subsumes.
+    # NOTE: no --n-hvg -> HVG is OFF; all genes passing --min-cells-frac are run via
+    # gene-blocking (auto-enabled). Runtime grows ~quadratically in gene count, so the
+    # gene floor doubles as the compute knob: 0.15 (~4k genes) ~2 min; 0.02 (~11k) ~15 min
+    # on CPU. metadata columns for --subset-col: Sample, Subject, Status, CellType, Cluster
 
 The gene x gene IDS call is exactly the repo's documented API:
     ids.compute_IDS(X)                       -> (d, d) all-pairs
@@ -100,6 +105,26 @@ def load_data(path, transpose=False, prefix=None):
     (keep the trailing dot; it must match the real filenames exactly).
     """
     import os
+    # COHORT-LEVEL LOAD: several comma-separated prefixes are merged into one object
+    # (the lab pipeline's run_Merge step). Each cell gets obs['Sample'] = its prefix
+    # without the trailing dot, which is the natural Harmony batch key.
+    if prefix is not None and "," in str(prefix) and os.path.isdir(path):
+        parts = [p.strip() for p in str(prefix).split(",") if p.strip()]
+        subs = []
+        for p in parts:
+            a = sc.read_10x_mtx(path, prefix=p)
+            s = p.rstrip(".")
+            a.obs["Sample"] = s
+            a.obs_names = [f"{s}_{b}" for b in a.obs_names]   # keep barcodes unique
+            subs.append(a)
+            print(f"  [load] {s}: {a.n_obs} cells")
+        adata = ad.concat(subs, join="inner")
+        adata.obs["Sample"] = adata.obs["Sample"].astype("category")
+        print(f"  [load] merged cohort: {adata.n_obs} cells x {adata.n_vars} genes "
+              f"from {len(parts)} samples")
+        if transpose:
+            adata = adata.T
+        return adata
     if os.path.isdir(path):
         adata = sc.read_10x_mtx(path, prefix=prefix)       # 10x Cell Ranger output
     elif path.endswith(".h5ad"):
@@ -154,8 +179,9 @@ def synthetic_adata(n_cells=3000, n_genes=400, seed=0):
 # ----------------------------------------------------------------------
 def join_metadata(adata, path, barcode_col="CellName", sample=None,
                   singlets_only=False, singlet_col="DemuxletDropletType",
-                  singlet_value="SNG", subset_col=None, subset_value=None,
-                  verbose=True):
+                  singlet_value="SNG", included_only=False,
+                  included_col="IncludedInStudy", included_values=("TRUE", "T", "1"),
+                  subset_col=None, subset_value=None, verbose=True):
     """Join per-cell metadata (barcode -> Subject / Status / CellType / ...) onto
     adata, then optionally keep singlets only and/or subset to one group.
 
@@ -203,6 +229,21 @@ def join_metadata(adata, path, barcode_col="CellName", sample=None,
         if col != barcode_col:
             adata.obs[col] = aligned[col].values
     adata = adata[matched].copy()                 # drop cells absent from metadata
+
+    # The SOURCE STUDY'S OWN QC VERDICT. GSE194315's metadata carries a per-cell
+    # IncludedInStudy flag: the cells the original authors kept after their full QC
+    # pipeline. It is STRICTLY STRONGER than our singlet filter — on PBMC-01-1 it
+    # keeps 17,858 cells vs 20,517 for singlets-only, i.e. it additionally drops
+    # 2,659 singlets that failed their QC for other reasons (and CellType is
+    # annotated only for included cells). Preferring this over hand-tuned cutoffs
+    # means we inherit QC done by the people who generated the data.
+    if included_only and included_col in adata.obs:
+        b = adata.n_obs
+        keep = adata.obs[included_col].astype(str).str.upper().isin(
+            [str(v).upper() for v in included_values])
+        adata = adata[keep.values].copy()
+        if verbose:
+            print(f"  [metadata] study QC only ({included_col}==TRUE): {b} -> {adata.n_obs}")
 
     if singlets_only and singlet_col in adata.obs:
         b = adata.n_obs
@@ -415,8 +456,28 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--data", default=None, help="path to .h5ad, .csv/.tsv, or 10x folder; omit for synthetic demo")
     ap.add_argument("--transpose", action="store_true", help="use if your table has genes as rows, cells as columns")
-    ap.add_argument("--prefix", default=None, help="filename prefix for a 10x folder (e.g. 'PBMC-01-1.' for GSE194315); keep the trailing dot")
-    ap.add_argument("--n-hvg", type=int, default=60)
+    ap.add_argument("--prefix", default=None,
+                    help="filename prefix for a 10x folder (e.g. 'PBMC-01-1.' for GSE194315); "
+                         "keep the trailing dot. COMMA-SEPARATE several to load a cohort "
+                         "(e.g. 'PBMC-01-1.,PBMC-01-2.') — samples are merged and tagged "
+                         "obs['Sample'], which is the natural --harmony-by batch key.")
+    # --- lab-pipeline replication: data-derived cell groups (PCA -> Harmony -> leiden) ---
+    ap.add_argument("--cluster-cells", action="store_true",
+                    help="derive cell groups the way the lab pipeline does: normalize+log1p -> "
+                         "HVG -> PCA -> Harmony(--harmony-by) -> neighbors -> leiden. Adds "
+                         "obs['leiden_res_<r>'], usable as --subset-col to run IDS within one "
+                         "batch-corrected cluster (mirrors how the lab groups rank_genes_groups).")
+    ap.add_argument("--cluster-res", type=float, default=0.6,
+                    help="leiden resolution for --cluster-cells (lab uses 0.2/0.4/0.6/0.8).")
+    ap.add_argument("--harmony-by", default="Sample",
+                    help="obs column to batch-correct on for --cluster-cells (default 'Sample'; "
+                         "ignored with a warning if absent).")
+    ap.add_argument("--n-pcs", type=int, default=20,
+                    help="PCs kept before Harmony/neighbors in --cluster-cells (lab config: 20).")
+    ap.add_argument("--n-hvg", type=int, default=None,
+                    help="highly-variable-gene count. DEFAULT None = NO HVG: keep all genes that "
+                         "pass the --min-cells-frac floor and run them via gene-blocking (auto-enabled "
+                         "when many genes remain). Set a number only to force HVG down-selection.")
     ap.add_argument("--p-norm", default="max")
     ap.add_argument("--p-val", action="store_true")
     ap.add_argument("--num-tests", type=int, default=200)
@@ -425,6 +486,17 @@ def main():
     ap.add_argument("--cluster", choices=["components", "greedy"], default="components",
                     help="module extraction: 'components' (connected components; can over-merge) "
                          "or 'greedy' (weighted modularity clustering; recommended for real data)")
+    ap.add_argument("--report-min-genes", type=int, default=3,
+                    help="Agenda 1b reporting rule: minimum genes for a program to be "
+                         "REPORTED (distinct from --min-size, which decides what "
+                         "extract_modules returns at all).")
+    ap.add_argument("--report-max-genes", type=int, default=50,
+                    help="Agenda 1b reporting rule: maximum genes. Above ~50 a greedy "
+                         "community is a compartment (ribosomal/mitochondrial), not a "
+                         "program with one interpretation.")
+    ap.add_argument("--report-top-n", type=int, default=None,
+                    help="report only the top N ranked programs; default reports ALL "
+                         "that pass the size filter (no hand-picking).")
     ap.add_argument("--log1p", action="store_true", help="apply log1p before min-max (usually hurts IDS; see preprocess docstring)")
     # --- single-cell QC (opt-in; applied to raw counts before normalization) ---
     ap.add_argument("--min-cells-frac", type=float, default=0.0,
@@ -446,6 +518,19 @@ def main():
     ap.add_argument("--singlets", action="store_true",
                     help="with --metadata, keep only demultiplexed singlets "
                          "(DemuxletDropletType==SNG) — drops doublets/ambiguous droplets.")
+    ap.add_argument("--included-only", action="store_true",
+                    help="with --metadata, keep only cells the SOURCE STUDY kept after its own "
+                         "QC (IncludedInStudy==TRUE). Stricter than --singlets (it also drops "
+                         "singlets that failed their QC) and RECOMMENDED as the primary QC gate.")
+    ap.add_argument("--dataset", default="gse194315",
+                    help="which dataset's particulars to use (see sc_ids/datasets/). "
+                         "Supplies the cell-type mapping when --celltype-map is omitted.")
+    ap.add_argument("--celltype-map", default=None,
+                    help="path to a granular<TAB>main cell-type mapping TSV. With "
+                         "--metadata, adds obs['CellTypeMain'] (30 granular labels -> "
+                         "5 main types), which is usable as --subset-col and is what "
+                         "UMAPs should be coloured by. Defaults to the mapping "
+                         "registered for --dataset; pass 'none' to skip.")
     ap.add_argument("--subset-col", default=None,
                     help="with --metadata, metadata column to subset on (e.g. Subject, CellType).")
     ap.add_argument("--subset-value", default=None,
@@ -482,7 +567,8 @@ def main():
         args.p_norm = int(args.p_norm)
 
     streaming = args.cell_batch is not None
-    blocked = args.block_size is not None
+    block_size = args.block_size
+    blocked = block_size is not None
     if (blocked or streaming) and args.p_val:
         ap.error("--p-val is not supported with --block-size/--cell-batch "
                  "(consistent permutations across blocks are a separate "
@@ -492,19 +578,75 @@ def main():
     print(f"Loaded {adata.n_obs} cells x {adata.n_vars} genes"
           f"{' (synthetic)' if args.data is None else ''}")
 
+    # A leiden subset can only be applied AFTER clustering, so hold it back here.
+    cluster_subset = args.subset_col is not None and args.subset_col.startswith("leiden")
+
     # metadata join / demultiplex / subset (before QC), if requested
     if args.metadata:
-        sample = args.metadata_sample or (args.prefix.rstrip(".") if args.prefix else None)
+        # cohort load (multi-prefix) already names cells '<Sample>_<barcode>', which IS
+        # the metadata CellName format -> no sample prefix needed for the join.
+        if args.prefix and "," in args.prefix:
+            sample = args.metadata_sample
+        else:
+            sample = args.metadata_sample or (args.prefix.rstrip(".") if args.prefix else None)
         adata = join_metadata(adata, args.metadata,
                               barcode_col=args.metadata_barcode_col, sample=sample,
                               singlets_only=args.singlets,
-                              subset_col=args.subset_col, subset_value=args.subset_value)
+                              included_only=args.included_only,
+                              subset_col=None if cluster_subset else args.subset_col,
+                              subset_value=None if cluster_subset else args.subset_value)
         print(f"After metadata join/subset: {adata.n_obs} cells x {adata.n_vars} genes")
+
+    # AGENDA 1a: collapse the 30 granular CellType labels onto main types. Done
+    # right after the join so obs['CellTypeMain'] is available to --subset-col and
+    # to every downstream plot. CellType is annotated only for IncludedInStudy
+    # cells, so this is a no-op without --metadata.
+    if args.metadata and str(args.celltype_map).lower() != "none" \
+            and "CellType" in adata.obs.columns:
+        from .celltypes import add_celltype_main
+        from .datasets import get as _get_ds
+        _map = args.celltype_map or _get_ds(args.dataset).celltype_map_path()
+        add_celltype_main(adata, path=_map)
 
     # single-cell QC (no-op unless the flags are set)
     if args.min_cells_frac > 0 or args.max_mt is not None or args.min_genes is not None:
         adata = qc_filter(adata, min_cells_frac=args.min_cells_frac,
                           max_mt=args.max_mt, min_genes=args.min_genes)
+
+    # LAB-PIPELINE PATTERN: derive cell groups from the data (PCA -> Harmony -> leiden)
+    # and use them as the IDS stratum, exactly as the lab groups rank_genes_groups by
+    # Harmony-corrected clusters. Batch is handled by WHICH cells are compared, not by
+    # altering expression (Harmony never produces corrected expression).
+    if args.cluster_cells:
+        from .viz import cluster_cells as _cluster
+        bkey = args.harmony_by if args.harmony_by in adata.obs.columns else None
+        if args.harmony_by and bkey is None:
+            print(f"  [cluster] '{args.harmony_by}' not in obs -> clustering WITHOUT "
+                  f"Harmony (no batch key available)")
+        labels = _cluster(adata, batch_key=bkey, resolution=args.cluster_res,
+                          n_pcs=args.n_pcs)
+        adata.obs[labels.name] = labels.values
+        print(f"  [cluster] added obs['{labels.name}'] "
+              f"({adata.obs[labels.name].nunique()} clusters); "
+              f"use --subset-col {labels.name} --subset-value <id> to run IDS in one")
+        if cluster_subset:
+            if args.subset_col not in adata.obs.columns:
+                raise SystemExit(f"  [cluster] '{args.subset_col}' not found; got "
+                                 f"'{labels.name}' (adjust --cluster-res or --subset-col)")
+            b = adata.n_obs
+            adata = adata[adata.obs[args.subset_col].astype(str) == str(args.subset_value)].copy()
+            print(f"  [cluster] subset {args.subset_col}=={args.subset_value}: {b} -> {adata.n_obs}")
+    elif cluster_subset:
+        ap.error("--subset-col leiden_* requires --cluster-cells")
+
+    # Drop-HVG default: with no HVG and many genes, run ALL genes via gene-blocking
+    # (the dense direct path can't build a (6d)x(6d) matrix for thousands of genes).
+    # Pair with --min-cells-frac to trim rare genes first and keep this tractable.
+    if not streaming and block_size is None and args.n_hvg is None and adata.n_vars > 2000:
+        block_size = 1024
+        blocked = True
+        print(f"  [auto] no HVG and {adata.n_vars} genes -> computing IDS over ALL "
+              f"genes via gene-blocking (block-size {block_size}).")
 
     X, genes = preprocess(adata, n_hvg=args.n_hvg, log1p=args.log1p,
                           keep_sparse=blocked or streaming)
@@ -514,7 +656,7 @@ def main():
           f"backend: {'torch' if HAVE_TORCH else 'numpy'})")
 
     if streaming:
-        bs = args.block_size or 256
+        bs = block_size or 256
         mode = "one-pass" if args.one_pass else "two-pass (paper: mean pass + centered correlate pass)"
         print(f"Computing IDS by streaming cells (batch {args.cell_batch}) "
               f"and blocking genes ({bs}); {mode}; peak memory ~ k^2*{bs}^2 + "
@@ -525,9 +667,9 @@ def main():
                                   save_means_to=args.save_means)
         P = None
     elif blocked:
-        print(f"Computing IDS in gene blocks of {args.block_size} "
+        print(f"Computing IDS in gene blocks of {block_size} "
               f"(peak memory ~ k^2 * block_size^2)")
-        C = compute_IDS_blocked(X, block_size=args.block_size,
+        C = compute_IDS_blocked(X, block_size=block_size,
                                 p_norm=args.p_norm, verbose=True)
         P = None
     else:
@@ -542,10 +684,22 @@ def main():
     modules = extract_modules(C, genes, P=P, min_ids=args.min_ids,
                               min_size=args.min_size, method=args.cluster)
     print(f"\nDiscovered {len(modules)} co-expression modules "
-          f"(method={args.cluster}, min_ids={args.min_ids}, min_size={args.min_size}; top 5):")
-    for m in modules[:5]:
+          f"(method={args.cluster}, min_ids={args.min_ids}, min_size={args.min_size})")
+
+    # AGENDA 1b: report by the PRE-REGISTERED rule (size filter, then rank by
+    # recurrence -> median IDS, report all of the top N) instead of eyeballing the
+    # list. See programs.py for why median rather than mean, and why the old
+    # "<=60 genes, first 6" selection was not defensible.
+    from . import programs as _pg
+    modules = _pg.annotate_programs(modules, C, min_ids=args.min_ids)
+    ranked, dropped = _pg.rank_programs(modules, min_genes=args.report_min_genes,
+                                        max_genes=args.report_max_genes,
+                                        top_n=args.report_top_n)
+    for m in ranked:
         preview = ", ".join(m["genes"][:8]) + ("…" if len(m["genes"]) > 8 else "")
-        print(f"  mean IDS {m['mean_ids']:.3f}  ({len(m['genes'])} genes): {preview}")
+        print(f"  {m['rank']:>2}. median IDS {m['median_ids']:.3f} "
+              f"(mean {m['mean_ids']:.3f}, density {m['density']:.2f}, "
+              f"{m['n_genes']} genes): {preview}")
 
     # If synthetic, verify the planted structure was recovered.
     if "planted" in adata.uns:

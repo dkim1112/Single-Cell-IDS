@@ -1,0 +1,5 @@
+program,top_cell_type,top_prop,top_n_cells,gap_to_second,second_cell_type,median_prop_across_types,top_enrichment,n_tied_at_top_prop,saturated,top_by_mean_score,top_mean_score,agree,specific
+P03_FCRL5,B naive,1.0,908,0.0,B intermediate,0.06885456885456885,7.456367432150313,3,True,B naive,3.536620685444918,True,True
+P04_PYHIN1,NK,1.0,1554,0.0,CD4 CTL,0.6055718475073314,2.4432890956355178,4,True,NK,4.0581301805021495,True,True
+P02_HES4,CD16 Mono,0.9977064220183486,436,0.11651830320646739,Platelet,0.6233480176211453,1.5653699951154165,1,False,CD16 Mono,4.294063683775997,True,True
+P01_HBB,cDC2,0.226890756302521,119,0.03892083149049094,CD8 TCM,0.1518987341772152,1.471247322458395,1,False,Platelet,0.34436435359539375,False,False

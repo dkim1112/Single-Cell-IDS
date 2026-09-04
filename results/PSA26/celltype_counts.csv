@@ -1,0 +1,31 @@
+CellType,CellTypeMain,count
+CD14 Mono,Myeloid Cell,4705
+CD4 TCM,T Cell,4196
+CD8 TEM,T Cell,1574
+NK,NK Cell,1554
+CD4 Naive,T Cell,1403
+B naive,B Cell,908
+CD8 Naive,T Cell,682
+CD16 Mono,Myeloid Cell,436
+Treg,T Cell,390
+B intermediate,B Cell,316
+CD4 TEM,T Cell,268
+CD4 CTL,T Cell,258
+gdT,T Cell,219
+B memory,B Cell,164
+CD8 TCM,T Cell,133
+NK_CD56bright,NK Cell,119
+cDC2,Myeloid Cell,119
+MAIT,T Cell,103
+Platelet,Other,101
+dnT,T Cell,57
+pDC,Myeloid Cell,44
+Eryth,Other,28
+NK Proliferating,NK Cell,27
+Plasmablast,Other,13
+CD4 Proliferating,T Cell,12
+ILC,Other,10
+cDC1,Myeloid Cell,9
+HSPC,Other,5
+ASDC,Myeloid Cell,3
+CD8 Proliferating,T Cell,2
