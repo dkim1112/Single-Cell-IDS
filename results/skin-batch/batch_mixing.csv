@@ -1,0 +1,7 @@
+key,perfect,before,after
+chemistry,0.474,0.393,0.667
+orig.ident,0.96,0.606,0.671
+donor,0.933,0.609,0.679
+disease,0.617,0.285,0.366
+celltype,0.582,0.003,0.004
+fullsubtype,0.795,0.105,0.105

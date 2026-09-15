@@ -295,6 +295,75 @@ def celltype_enrichment(adata, score_names, celltype_col="CellType",
     return df[cols].reset_index(drop=True)
 
 
+def programs_by_celltype(enrichment_df, min_cells=50, top_n=None):
+    """THE TRANSPOSE OF celltype_enrichment: for one CELL TYPE, which programs?
+
+    `celltype_enrichment` answers "given this program, which cell type is it in?".
+    That is the right question when you are validating a program. It is the wrong
+    question when you already care about a cell type and want to know what it is
+    doing — e.g. "what are the main gene programs in keratinocytes?". Same table,
+    read down the other axis.
+
+    RANKED BY MEAN SCORE, not proportion. Proportion answers "in how many of this
+    type's cells is the program on at all", and with the score > 0 cutoff that
+    saturates near 1.00 for several programs at once (measured on skin: every cell
+    type reached ~1.00 for the mast-cell program). Mean score keeps separating
+    after proportion has stopped, so it is the usable key for this direction.
+
+    `enrichment` is carried through unchanged, and it is what stops the answer
+    being trivial: a program can have the highest mean score in a cell type and
+    still be a housekeeping program that every other type expresses just as
+    strongly. Read the two together — high mean score AND enrichment > 1 means the
+    program is both strong here and preferential to here.
+
+    Cell types below `min_cells` are dropped: a ranking built on 40 cells is noise,
+    and the Wilson intervals in the source table are the evidence for that.
+    """
+    import pandas as pd
+
+    df = enrichment_df[enrichment_df["n_cells"] >= min_cells].copy()
+
+    # RANK BY score_gap, NOT by mean_score. Ranking on the raw mean score puts the
+    # same program on top of nearly every cell type: on skin the mitochondrial
+    # program scored ~5 in all 26 types and won 24 of them. It is the strongest
+    # program everywhere, which is exactly why it says nothing about any one type.
+    #
+    #   score_gap = this type's mean score - the median mean score across types
+    #
+    # i.e. how far above the TYPICAL cell type this one sits, in score units. A
+    # program every type expresses equally has a gap near 0 whatever its absolute
+    # level. Subtraction rather than a ratio because mean scores go negative, which
+    # makes a ratio meaningless.
+    med = df.groupby("program")["mean_score"].transform("median")
+    df["score_gap"] = df["mean_score"] - med
+    df = df.sort_values(["cell_type", "score_gap"], ascending=[True, False])
+    df["rank_in_celltype"] = df.groupby("cell_type").cumcount() + 1
+    if top_n is not None:
+        df = df[df["rank_in_celltype"] <= top_n]
+    cols = ["cell_type", "rank_in_celltype", "program", "n_cells", "score_gap",
+            "mean_score", "prop_expressing", "enrichment"]
+    return df[cols].reset_index(drop=True)
+
+
+def celltype_program_summary(by_celltype_df, top_n=3):
+    """One row per cell type: its top `top_n` programs, as a readable string.
+
+    For scanning 26 cell types at once without opening the long table.
+    """
+    import pandas as pd
+    rows = []
+    for ct, g in by_celltype_df.groupby("cell_type", sort=False):
+        g = g.sort_values("rank_in_celltype").head(top_n)
+        rows.append({
+            "cell_type": ct,
+            "n_cells": int(g["n_cells"].iloc[0]),
+            "top_programs": "  |  ".join(
+                f"{r.program} (gap {r.score_gap:+.2f}, enrich {r.enrichment:.2f})"
+                for r in g.itertuples()),
+        })
+    return pd.DataFrame(rows).sort_values("n_cells", ascending=False).reset_index(drop=True)
+
+
 def specificity_summary(enrichment_df, min_cells=100):
     """One row per program: is this ranking actually telling us anything?
 
