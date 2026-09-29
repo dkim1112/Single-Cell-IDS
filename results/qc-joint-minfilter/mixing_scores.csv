@@ -1,0 +1,5 @@
+key,perfect,before_raw,before_of_perfect,after_raw,after_of_perfect
+tissue,0.268,0.002,0.008,0.032,0.121
+main,0.683,0.006,0.009,0.008,0.012
+subtype,0.851,0.122,0.144,0.138,0.162
+donor,0.949,0.568,0.599,0.575,0.606

@@ -1,0 +1,9 @@
+stage,tissue,main,n,pct_other_tissue,top_partner,share
+before,skin,T cell,4466,2.6,T cell,87.2
+before,skin,Myeloid cell,1435,1.1,Myeloid cell,77.8
+before,PBMC,T cell,7185,0.3,T cell,95.7
+before,PBMC,Myeloid cell,3386,0.1,Myeloid cell,95.2
+after,skin,T cell,4466,37.1,T cell,94.2
+after,skin,Myeloid cell,1435,31.4,Myeloid cell,93.6
+after,PBMC,T cell,7185,3.1,T cell,93.1
+after,PBMC,Myeloid cell,3386,2.0,Myeloid cell,95.1

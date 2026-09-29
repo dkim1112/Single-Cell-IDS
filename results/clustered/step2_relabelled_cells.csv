@@ -1,0 +1,47 @@
+tissue,main,cluster_label,n
+PBMC,NK cell,T cell,1227
+skin,Eccrine gland,Mast cell,270
+skin,Nerve cell,Fibroblast,263
+PBMC,B cell,T cell,56
+PBMC,Other,B cell,53
+skin,Myeloid cell,B cell,45
+PBMC,Myeloid cell,B cell,37
+skin,Eccrine gland,Keratinocyte,34
+PBMC,Other,T cell,28
+skin,Mast cell,Keratinocyte,17
+skin,Fibroblast,Smooth muscle,8
+skin,Mast cell,Fibroblast,6
+PBMC,ILC,T cell,6
+skin,Keratinocyte,Mast cell,5
+skin,Smooth muscle,Fibroblast,5
+skin,T cell,Mast cell,4
+skin,T cell,B cell,4
+skin,Nerve cell,Mast cell,4
+skin,Fibroblast,Endothelial,4
+PBMC,T cell,Mast cell,4
+PBMC,NK cell,Mast cell,3
+PBMC,Myeloid cell,T cell,3
+skin,Endothelial,Mast cell,3
+skin,Eccrine gland,Fibroblast,3
+skin,Mast cell,Endothelial,2
+skin,Endothelial,Fibroblast,2
+PBMC,T cell,Myeloid cell,2
+skin,Nerve cell,Endothelial,2
+skin,Fibroblast,Mast cell,2
+PBMC,Myeloid cell,Mast cell,1
+PBMC,Other,Myeloid cell,1
+PBMC,Other,Mast cell,1
+PBMC,ILC,Mast cell,1
+skin,Fibroblast,Keratinocyte,1
+skin,Eccrine gland,T cell,1
+skin,Eccrine gland,Smooth muscle,1
+skin,Fibroblast,B cell,1
+skin,Fibroblast,Melanocyte,1
+skin,Keratinocyte,Endothelial,1
+skin,Keratinocyte,B cell,1
+skin,Mast cell,Smooth muscle,1
+skin,Keratinocyte,Smooth muscle,1
+skin,Melanocyte,Mast cell,1
+skin,Mast cell,T cell,1
+skin,Nerve cell,Smooth muscle,1
+skin,Nerve cell,T cell,1

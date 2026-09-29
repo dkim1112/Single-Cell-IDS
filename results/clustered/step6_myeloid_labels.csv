@@ -1,0 +1,7 @@
+subcluster,n,label_overall,n_PBMC,top_PBMC,top_PBMC_share,n_skin,top_skin,top_skin_share
+0,748,CD14 Mono,694,CD14 Mono,99.9,54,PVM,72.2
+1,816,CD14 Mono,799,CD14 Mono,99.7,17,cDC2B,70.6
+2,1465,CD14 Mono,792,CD14 Mono,94.6,673,cDC2B,90.3
+3,905,CD14 Mono,753,CD14 Mono,98.5,152,cDC2B,50.0
+4,315,CD16 Mono,213,CD16 Mono,93.0,102,cDC2A,82.4
+5,489,LC,97,cDC2,89.7,392,LC,80.1

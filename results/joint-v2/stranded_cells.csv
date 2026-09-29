@@ -1,0 +1,16 @@
+,frac_other,neighbour_majority,stranded,tissue,main,subtype,T_markers_detected,myeloid_markers_detected,n_genes,UMIs,verdict,pct_mt
+ACCGTTCTCGCGTGAC-1-0,1.0,T cell,True,PBMC,Myeloid cell,CD14 Mono,0.0,0.33,321,867,neither (low quality),51.4977
+CGATGCGGTTCAGCGC-1-0,0.9,T cell,True,PBMC,Myeloid cell,CD14 Mono,0.0,0.83,445,1151,own lineage (label fits),44.2324
+CTCCCAACAATAGTAG-1-0,1.0,T cell,True,PBMC,Myeloid cell,CD14 Mono,0.0,0.17,1084,2416,neither (low quality),35.729
+CTGAGCGGTGTTTGCA-1-0,0.8666666666666667,T cell,True,PBMC,Myeloid cell,CD14 Mono,0.0,0.33,555,1252,neither (low quality),40.5104
+CTTTCAACATGCAGCC-1-0,0.9666666666666667,T cell,True,PBMC,Myeloid cell,CD14 Mono,0.0,0.17,341,1002,neither (low quality),52.1436
+GAAGTAAAGAATCCCT-1-0,0.9,T cell,True,PBMC,Myeloid cell,CD14 Mono,0.0,0.17,604,1714,neither (low quality),48.4266
+TCCCATGAGGGTCACA-1-0,0.8666666666666667,T cell,True,PBMC,Myeloid cell,CD14 Mono,0.0,0.33,375,786,neither (low quality),38.9594
+TGAGGTTAGGACTAAT-1-0,1.0,T cell,True,PBMC,Myeloid cell,CD14 Mono,0.0,0.33,937,2072,neither (low quality),24.9277
+CATTGAGCAAGGGTCA-1-0,0.9,T cell,True,PBMC,Myeloid cell,pDC,0.0,0.17,658,1235,neither (low quality),23.2201
+ACGGGTCCATGAACCT-9-1,1.0,T cell,True,skin,Myeloid cell,PVM,0.0,0.67,471,1076,own lineage (label fits),5.483271375464684
+CTAACTTAGGATCGCA-9-1,1.0,T cell,True,skin,Myeloid cell,PVM,0.0,0.33,380,791,neither (low quality),6.447534766118837
+ATCTTCAAGATCCCGC-1-0,1.0,Myeloid cell,True,PBMC,T cell,CD4 Proliferating,0.25,0.33,3105,11974,neither (low quality),13.5696
+AGGATCTTCTTTGCGC-1-0,0.9666666666666667,Myeloid cell,True,PBMC,T cell,CD4 TCM,1.0,1.0,3067,13698,both lineages (doublet-like),9.0962
+ATCCCTGGTGGAAGTC-1-0,1.0,Myeloid cell,True,PBMC,T cell,CD4 TCM,0.0,0.67,645,1454,other lineage (likely mislabeled),1.0302
+TCATTTGGTTGCGGAA-1-0,0.9666666666666667,Myeloid cell,True,PBMC,T cell,CD4 TCM,0.75,0.83,2201,6420,both lineages (doublet-like),6.7881

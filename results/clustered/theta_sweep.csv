@@ -1,0 +1,11 @@
+lineage,theta,skin_nbrs_from_PBMC,PBMC_nbrs_from_skin,within_tissue_subtype_purity
+T/NK,none,1.71,0.09,0.635
+T/NK,2,3.71,0.38,0.634
+T/NK,4,15.3,1.4,0.631
+T/NK,8,17.18,1.48,0.631
+T/NK,16,18.27,1.5,0.631
+myeloid,none,0.63,0.03,0.939
+myeloid,2,1.73,0.19,0.941
+myeloid,4,4.58,0.31,0.942
+myeloid,8,11.81,0.53,0.937
+myeloid,16,15.98,0.8,0.93

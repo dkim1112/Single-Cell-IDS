@@ -1,0 +1,9 @@
+{
+  "stranded_original": 15,
+  "cells": {
+    "original": 20514,
+    "expanded": 24175,
+    "myeloid": 6751,
+    "tcell": 13763
+  }
+}

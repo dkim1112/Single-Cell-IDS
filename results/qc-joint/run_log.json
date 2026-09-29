@@ -1,0 +1,25 @@
+{
+  "gene_filter": 0.01,
+  "shared_genes_before_any_filter": 32991,
+  "PBMC": {
+    "cells_in": 17858,
+    "mt_genes_found": 13,
+    "fail_min_genes": 0,
+    "fail_pct_mt": 5094,
+    "fail_singlet": 0,
+    "cells_kept": 12764,
+    "pct_kept": 71.5
+  },
+  "skin": {
+    "cells_in": 67378,
+    "mt_genes_found": 13,
+    "fail_min_genes": 11,
+    "fail_pct_mt": 0,
+    "fail_singlet": 0,
+    "cells_kept": 67367,
+    "pct_kept": 100.0
+  },
+  "genes_kept": 10126,
+  "joint_cells": 80131,
+  "joint_genes": 10126
+}

@@ -1,0 +1,47 @@
+main,tissue,subtype,neighbour_majority,n
+NK cell,PBMC,NK,T cell,81
+T cell,skin,yd T cell,NK cell,59
+T cell,PBMC,gdT,NK cell,45
+T cell,PBMC,CD8 TEM,NK cell,31
+Myeloid cell,skin,cDC1,B cell,25
+NK cell,PBMC,NK_CD56bright,T cell,21
+Myeloid cell,PBMC,CD14 Mono,T cell,12
+ILC,PBMC,ILC,T cell,10
+Myeloid cell,skin,PVM,B cell,9
+T cell,PBMC,CD4 CTL,NK cell,9
+T cell,PBMC,CD4 TCM,B cell,6
+T cell,skin,Tc17 cell,NK cell,6
+T cell,skin,Stressed T cell,NK cell,5
+Myeloid cell,PBMC,CD16 Mono,T cell,5
+T cell,PBMC,CD4 CTL,B cell,4
+Myeloid cell,PBMC,cDC2,B cell,4
+T cell,PBMC,CD4 TCM,Myeloid cell,4
+T cell,skin,Cytotoxic T cell,NK cell,4
+T cell,PBMC,CD8 Naive,B cell,3
+T cell,PBMC,gdT,B cell,3
+NK cell,PBMC,NK,B cell,3
+Myeloid cell,skin,cDC2A,B cell,3
+B cell,PBMC,B intermediate,T cell,2
+T cell,skin,Stressed T cell,B cell,2
+T cell,PBMC,CD8 TEM,B cell,2
+Myeloid cell,skin,cDC2B,B cell,2
+Mast cell,skin,Mast cell,T cell,2
+B cell,PBMC,B naive,Myeloid cell,1
+Myeloid cell,PBMC,CD14 Mono,B cell,1
+B cell,PBMC,B memory,Myeloid cell,1
+Myeloid cell,skin,PVM,T cell,1
+Myeloid cell,PBMC,pDC,T cell,1
+Myeloid cell,PBMC,pDC,B cell,1
+Myeloid cell,PBMC,CD16 Mono,Mast cell,1
+NK cell,PBMC,NK Proliferating,T cell,1
+NK cell,PBMC,NK Proliferating,B cell,1
+NK cell,PBMC,NK_CD56bright,B cell,1
+T cell,PBMC,CD4 Naive,B cell,1
+T cell,PBMC,CD4 TCM,Mast cell,1
+T cell,PBMC,CD4 Proliferating,NK cell,1
+T cell,PBMC,CD4 Proliferating,Myeloid cell,1
+T cell,PBMC,CD4 TCM,NK cell,1
+T cell,PBMC,MAIT,B cell,1
+T cell,PBMC,CD8 TCM,NK cell,1
+T cell,skin,IFN T cell,NK cell,1
+T cell,skin,Treg,B cell,1
