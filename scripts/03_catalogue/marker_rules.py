@@ -1,0 +1,77 @@
+"""marker_rules.py — rule-based marker-gene labels used to name a program (a starting label, not a citation)."""
+# (label, markers, how many must be present)
+RULES = [
+    ("cytotoxic effector (NK / CD8 / γδ T killing machinery)",
+     {"GNLY", "NKG7", "GZMA", "GZMB", "GZMH", "GZMK", "PRF1", "KLRD1", "KLRF1",
+      "FGFBP2", "CTSW", "CST7", "CCL5", "FCGR3A", "CLIC3"}, 3),
+    ("T-cell identity / receptor signalling",
+     {"CD3D", "CD3E", "CD3G", "TRAC", "CD2", "CD7", "CD247", "LCK", "IL7R"}, 3),
+    ("B-cell identity",
+     {"CD79A", "CD79B", "MS4A1", "BANK1", "BLK", "CD22", "TCL1A", "BCL11A"}, 3),
+    ("antigen presentation (MHC class II)",
+     {"CD74", "HLA-DRA", "HLA-DRB1", "HLA-DPA1", "HLA-DPB1", "HLA-DQA1",
+      "HLA-DQB1", "HLA-DMA", "HLA-DMB", "CIITA"}, 3),
+    ("conventional dendritic cell (cDC2)",
+     {"CD1C", "CLEC10A", "FCER1A", "ENHO", "CD1A", "CD207"}, 2),
+    ("plasmacytoid dendritic cell",
+     {"IL3RA", "JCHAIN", "PLD4", "SERPINF1", "MZB1", "ITM2C", "PPP1R14B"}, 3),
+    ("monocyte / macrophage core",
+     {"CD14", "CD68", "AIF1", "LYZ", "VCAN", "FCN1", "CSF3R", "FPR1", "CLEC7A",
+      "LILRB2", "MS4A6A", "LST1", "SPI1", "IGSF6", "CSTA"}, 3),
+    ("inflammatory chemokine release (MIP-1 / IL-8 axis)",
+     {"CCL3", "CCL3L3", "CCL4", "CCL4L2", "CXCL8", "IL1B", "CCL20", "CXCL1",
+      "CXCL2"}, 2),
+    ("interferon-stimulated response",
+     {"ISG15", "IFI6", "IFI27", "IFI44L", "MX1", "MX2", "OAS1", "OAS3", "IFIT1",
+      "IFIT3", "STAT1", "IRF7", "BST2", "XAF1"}, 3),
+    ("antimicrobial / psoriasis keratinocyte response",
+     {"S100A7", "S100A8", "S100A9", "S100A12", "SERPINB3", "SERPINB4", "SPRR2A",
+      "DEFB4A", "LCN2", "PI3", "KRT6A", "KRT16", "KRT17"}, 3),
+    ("cornified envelope / terminal keratinocyte differentiation",
+     {"FLG", "LOR", "IVL", "CDSN", "CNFN", "CALML5", "CST6", "SPINK5", "KRT1",
+      "KRT10", "KRT2", "DSC1", "DSG1", "DSP", "ASS1", "DMKN"}, 3),
+    ("basal keratinocyte / adhesion to basement membrane",
+     {"COL17A1", "COL7A1", "ITGB1", "KRT5", "KRT14", "KRT15", "DST", "CXCL14"}, 3),
+    ("metallothionein / metal and oxidative stress",
+     {"MT1E", "MT1X", "MT1G", "MT1M", "MT2A", "MT1F", "MT1A"}, 2),
+    ("AP-1 / immediate-early activation",
+     {"FOS", "FOSB", "JUN", "JUNB", "JUND", "EGR1", "ATF3", "IER2", "DUSP1",
+      "ZFP36", "NFKBIA", "BTG2", "GADD45B", "HES1"}, 4),
+    ("heat-shock / protein folding (also a dissociation artefact)",
+     {"HSPA1A", "HSPA1B", "HSPA6", "HSPA8", "HSPH1", "HSP90AA1", "DNAJB1",
+      "DNAJA1", "HSPB1"}, 3),
+    ("melanocyte identity / pigmentation",
+     {"DCT", "PMEL", "MLANA", "TYRP1", "EDNRB", "BCAN", "CRABP1", "ADGRG1",
+      "GPM6B", "CDH19"}, 3),
+    ("mast cell identity",
+     {"TPSB2", "TPSAB1", "CPA3", "KIT", "MS4A2", "GATA2", "HPGD", "CMA1"}, 2),
+    ("endothelial activation / leukocyte adhesion",
+     {"SELE", "ICAM1", "VCAM1", "C2CD4B", "RND1", "ACKR1", "CCL2"}, 2),
+    ("lymphatic endothelium",
+     {"CCL21", "PROX1", "LYVE1", "PDPN", "TFPI", "SDPR"}, 2),
+    ("vascular endothelium",
+     {"PECAM1", "VWF", "CDH5", "CLDN5", "AQP1", "A2M", "ADGRL4", "EGFL7"}, 3),
+    ("fibroblast / extracellular matrix",
+     {"COL1A1", "COL1A2", "COL3A1", "DCN", "LUM", "AEBP1", "ABI3BP", "APCDD1",
+      "SFRP2", "SFRP4", "POSTN"}, 3),
+    ("smooth muscle / pericyte contractility",
+     {"ACTA2", "TAGLN", "MYL9", "CALD1", "CARMN", "ADRA2A", "COX4I2", "NOTCH3"}, 3),
+    ("sweat gland / secretory",
+     {"DCD", "MUCL1", "SCGB2A2", "SCGB1D2", "PIP", "KRT7", "KRT8", "KRT18",
+      "AQP5"}, 2),
+    ("proliferation / cell cycle",
+     {"MKI67", "TOP2A", "PCNA", "TYMS", "STMN1", "CENPF", "TUBB", "TUBA1B",
+      "UBE2C", "BIRC5"}, 3),
+    ("nerve / Schwann cell",
+     {"MBP", "PMP22", "S100B", "MATN2", "PSAP", "SEMA3B", "NGFR"}, 3),
+]
+
+
+def annotate(genes):
+    g = set(x.strip() for x in genes.split(","))
+    hits = [(lbl, len(g & mk)) for lbl, mk, need in RULES if len(g & mk) >= need]
+    if not hits:
+        return "", ""
+    hits.sort(key=lambda h: -h[1])
+    ev = ", ".join(sorted(g & dict((l, m) for l, m, _ in RULES)[hits[0][0]]))
+    return hits[0][0], ev

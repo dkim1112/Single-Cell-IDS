@@ -3,7 +3,8 @@ GSE194315 — PBMC CITE-seq, psoriatic arthritis and healthy controls.
 https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE194315
 
 Everything here was established empirically on this dataset; see
-docs/agenda1_and_3_results.md and the handoff for the measurements behind it.
+docs/data_inventory.md for the lanes in use, and docs/notes/agenda1_and_3_results.md for the
+measurements behind the settings below.
 
 Structure worth remembering when reading the field values below:
   * Each 10x lane (PBMC-01-1, PBMC-01-2, ...) pools NINE genetically distinct
@@ -48,3 +49,20 @@ GSE194315 = register(Dataset(
         n_pcs=20,
     ),
 ))
+
+
+# The 9 of the 28 lanes used for the disease analysis (scripts/02_ids_programs/build_disease_object.py).
+# Donor counts are per lane after the filters in that script; each lane pools several donors, and the
+# same donor appears in more than one lane. Full table and the lanes NOT used: docs/data_inventory.md.
+LANES_USED = {
+    "PBMC-01-1": "PsA only (9 donors). The lane the QC / UMAP / labelling work was done on. "
+                 "Cannot support a disease contrast on its own.",
+    "PBMC-03-1": "Healthy + PSO + PsA together (7 / 3 / 1 donors): healthy vs PSO without a lane confound.",
+    "PBMC-03-3": "Same design as PBMC-03-1.",
+    "PBMC-05-1": "Healthy + PSO + PsA together (9 / 6 / 1 donors): healthy vs PSO without a lane confound.",
+    "PBMC-05-2": "Same design as PBMC-05-1.",
+    "PBMC-06-1": "PSO + PsA together (6 / 12 donors, no healthy): PsA vs PSO in the same lane.",
+    "PBMC-06-2": "Same design as PBMC-06-1.",
+    "PBMC-06-3": "Same design as PBMC-06-1.",
+    "PBMC-06-4": "Same design as PBMC-06-1.",
+}

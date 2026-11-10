@@ -17,8 +17,8 @@ Clustering must run on the Harmony graph, not the raw one: on the raw graph the
 clusters would just be "skin" and "PBMC".
 
 Usage:
-  python scripts/cluster_pipeline.py --joint results/qc-joint/qc_joint_embedded.h5ad \
-      --resolution 0.20 --out results/clustered
+  python scripts/01_qc_labelling/cluster_pipeline.py --joint results/01_qc_labelling/qc-joint/qc_joint_embedded.h5ad \
+      --resolution 0.20 --out results/01_qc_labelling/clustered
 """
 import argparse, json, os, sys
 import numpy as np
@@ -32,8 +32,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from sklearn.neighbors import NearestNeighbors
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
-from sc_ids.viz import compute_embedding  # noqa: E402
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "src"))
 
 RESOLUTIONS = [0.20, 0.40, 0.60, 0.80]          # lab config_sample.json
 TISSUE_COLORS = {"PBMC": "#1f77b4", "skin": "#ff7f0e"}

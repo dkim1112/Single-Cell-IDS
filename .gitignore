@@ -16,3 +16,13 @@ __pycache__/
 *.egg-info/
 build/
 dist/
+
+# --- Superseded files kept for one review pass ---
+_archive/
+
+# --- Regenerable IDS matrices ---
+*.npy
+
+# --- Per-lane data files and score tables: rebuilt in minutes by scripts/04_method_checks ---
+results/00_units/
+results/04_method_checks/scores_*.csv.gz

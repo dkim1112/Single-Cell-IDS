@@ -23,9 +23,9 @@ Everything downstream (normalize 1e6 -> log1p -> HVG 2000 -> PCA 20 ->
 Harmony -> neighbors -> UMAP) follows the lab pipeline's own steps.
 
 Usage:
-  python scripts/qc_joint_pipeline.py \
-      --pbmc results/PSA26/embedded.h5ad --skin GSE173706_skin.h5ad \
-      --gene-filter 0.01 --out results/qc-joint
+  python scripts/01_qc_labelling/qc_joint_pipeline.py \
+      --pbmc results/01_qc_labelling/PSA26/embedded.h5ad --skin <GSE173706 skin h5ad> \
+      --gene-filter 0.01 --out results/01_qc_labelling/qc-joint
 """
 import argparse, json, os, sys
 import numpy as np
@@ -37,7 +37,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from sklearn.neighbors import NearestNeighbors
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "src"))
 from sc_ids.viz import compute_embedding  # noqa: E402
 
 MIN_GENES, MAX_MT = 200, 10.0

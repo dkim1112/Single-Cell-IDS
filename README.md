@@ -23,12 +23,20 @@ src/
     ├── programs.py       program ranking rule + cell-type enrichment
     ├── celltypes.py      granular subtype → main cell type
     ├── viz.py            PCA → Harmony → UMAP, Leiden, plots
+    ├── units.py          one file per lane / sample, lane-by-lane scoring (matches scanpy)
     ├── datasets/         per-dataset particulars (see below)
     └── resources/        cell-type mapping files, one per dataset
-docs/                     method decisions and results, read these first
-results/<run>/            outputs of a run
+scripts/                  analysis scripts, one folder per pipeline stage (see "Pipeline" below)
+data/                     INPUT: raw GEO downloads. Read-only, gitignored
+results/                  OUTPUT: one folder per stage, one subfolder per run
+deliverables/             OUTPUT for other people: workbooks sent to Dr. Patrick
+docs/                     abstract, reports, method notes, data inventory (read data_inventory.md first)
 tests/                    exactness tests for batching/streaming, logic tests for programs
+_archive/                 superseded files, kept for one review pass (gitignored; see MANIFEST.md)
 ```
+
+Paths are defined once in `src/sc_ids/paths.py`. If the data live elsewhere, set `SC_IDS_DATA`
+(and `SC_IDS_PBMC_DIR` for the PBMC matrices) instead of editing scripts.
 
 ### `datasets/` — where dataset-specific facts live
 
@@ -37,9 +45,9 @@ keyed, which column is the QC gate, which is the cell type, which columns define
 batch-free stratum, and starting parameters. The generic code takes these as
 arguments and knows about no particular study.
 
-**Adding a dataset means adding one file there.** `datasets/skin.py` is a checklist
-of what must be answered before a skin dataset can be run; it deliberately
-registers nothing until those answers exist.
+**Adding a dataset means adding one file there.** `datasets/psoriasis_skin.py` is the
+worked example of a second dataset: its docstring lists the seven things that differed
+from the blood data and the code each one needed.
 
 Note that `defaults` are *starting points that worked on that dataset*, not settings
 that transfer. `min_ids` in particular must be re-derived from each dataset's own
@@ -67,7 +75,7 @@ python -m sc_ids.analysis \
   --data data/GSE194315_PBMC-01-07_processed_data_files --prefix "PBMC-01-1." \
   --metadata data/GSE194315_CellMetadata-AS_TotalCiteseq_20220711.tsv \
   --discovery-col Subject --discovery-value PSA26 \
-  --out results/PSA26
+  --out results/01_qc_labelling/PSA26
 ```
 
 Programs are **discovered** on one stratum and **scored** on every cell in the file,
@@ -76,6 +84,34 @@ out-of-sample check. Thresholds come from `--dataset` unless overridden, and the
 prints which values it inherited.
 
 Data (GSE194315, ~3 GB) is gitignored and kept locally under `data/`.
+
+## Pipeline: raw data to the program catalogue
+
+Scripts are numbered by stage. Each stage reads the one before it and writes only to its own
+`results/` folder. Run from the repo root.
+
+| Stage | Run in this order | Writes to | What it does |
+|---|---|---|---|
+| `01_qc_labelling` | `qc_joint_pipeline` → `cluster_pipeline` → `theta_tuning` → `rank_markers` → `nk_percell`, `nk_deg_export`, `nk_deg_workbook` | `results/01_qc_labelling/` | QC both tissues, align blood and skin on a UMAP, label T/NK and myeloid sub-clusters, check the NK call. Blood: lane PBMC-01-1 only. |
+| `02_ids_programs` | `build_disease_object` → `ids_programs_disease` (whole tissue, then `--lineage T+NK`, `Myeloid`, `Keratinocyte`) → `ids_program_atlas` | `results/02_ids_programs/` | Build the blood + skin object with disease state (9 blood lanes), find IDS programs in each tissue × disease stratum, say where each is expressed. |
+| `03_catalogue` | `program_catalogue` → `disease_contrasts` → `distinct_programs` → `catalogue_workbook` (`keratinocyte_detection` is independent) | `results/03_catalogue/`, `deliverables/` | Permutation test, activity score, merge 194 detections into distinct programs, donor-level disease tests, the workbook. |
+| `04_method_checks` | `build_units` → `score_units` → `disease_tests`; `discovery_runs` → `discovery_compare` → `variant_blood_tests`; `permutation_runs` | `results/04_method_checks/` | One file per lane (memory stays at one lane), all 28 blood lanes, and the checks on donors, cell-type level, discovery choices and shuffle count. Summary: `results/04_method_checks/README.md`. |
+
+Which lanes are used and why: `docs/data_inventory.md`. Old paths: `docs/path_map.md`.
+
+### Which data layout to use
+
+There are two, and they hold exactly the same cells (checked cell for cell, November 2026).
+
+| Layout | Built by | Read by | Memory |
+|---|---|---|---|
+| **One file per lane / sample (use this)** | `scripts/04_method_checks/build_units.py` | stage 04, through `sc_ids.units` | about 1.5 GB to build, whatever the number of lanes |
+| One merged object per tissue (older) | `scripts/02_ids_programs/build_disease_object.py` | stages 02 and 03 | grows with every lane; the nine-lane blood build was killed at 6 GB |
+
+Start new work from the per-lane layout: it covers all 28 blood lanes, and its scoring matches scanpy on the
+merged object to rounding error (`scripts/04_method_checks/validate_scoring.py`). Stages 02 and 03 still read
+the merged objects and have not been ported yet. Their saved outputs in `results/` were reproduced exactly from
+the per-lane files, so nothing has to be rebuilt to use them.
 
 ## Two representations, on purpose
 
@@ -87,13 +123,17 @@ Computed separately from the same counts; do not conflate them.
 
 ## Docs
 
-- `docs/agenda1_and_3_results.md` — the cell-type mapping, the program-selection
+- `docs/data_inventory.md` — the PBMC lanes in use (9 of 28) and what each is for, the unused lanes, skin donors
+- `docs/abstract/abstract_notes.md` — methods, limitations and numbers behind the KSID abstract
+- `docs/notes/agenda1_and_3_results.md` — the cell-type mapping, the program-selection
   rule and why it is fixed in advance, and the cell-type enrichment results
-- `docs/agenda2_combining_strata.md` — how to combine stratified runs, and why
+- `docs/notes/agenda2_combining_strata.md` — how to combine stratified runs, and why
   Harmony cannot be used for IDS
-- `docs/scope_skin_extension.md` — what extending to a second (skin) dataset covers,
+- `docs/notes/scope_skin_extension.md` — what extending to a second (skin) dataset covers,
   and the four gaps between two program lists and a shared-program claim
-- `docs/architecture.html` — visual explainer of the batching design
+- `docs/notes/architecture.html` — visual explainer of the batching design
+- `docs/reports/` — QC, clustering and theta/labelling reports (stage 01)
+- `docs/path_map.md` — where files moved in the October 2026 reorganisation
 
 ## Upstream
 

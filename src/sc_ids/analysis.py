@@ -6,7 +6,7 @@ gene programs plus their cell-type assignment (Agendas 1 and 3).
         --data data/GSE194315_PBMC-01-07_processed_data_files --prefix "PBMC-01-1." \
         --metadata data/GSE194315_CellMetadata-AS_TotalCiteseq_20220711.tsv \
         --discovery-col Subject --discovery-value PSA26 \
-        --min-cells-frac 0.02 --min-ids 0.5 --out results/PSA26
+        --min-cells-frac 0.02 --min-ids 0.5 --out results/01_qc_labelling/PSA26
 
 DISCOVERY SET vs EVALUATION SET — the important structural choice here.
 IDS runs on the DISCOVERY set (one subject inside one file: batch and donor both
