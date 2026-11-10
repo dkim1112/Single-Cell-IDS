@@ -1,0 +1,8 @@
+program_id,perm_p_median,perm_p_max,frac_pairs_beat_all_shuffles
+T+NK|PBMC_Healthy|P01,0.4667,0.8833,0.333
+T+NK|PBMC_Healthy|P02,0.0,0.0,1.0
+T+NK|PBMC_Healthy|P03,0.0,0.0,1.0
+T+NK|PBMC_Healthy|P04,0.0,0.0,1.0
+T+NK|PBMC_Healthy|P05,0.0,0.0,1.0
+T+NK|PBMC_Healthy|P06,0.2417,0.9667,0.2
+T+NK|PBMC_Healthy|P07,0.0,0.0,1.0

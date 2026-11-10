@@ -1,0 +1,7 @@
+stratum,reason,n_genes,first_genes
+PBMC_PSA,too_small,2,"DUSP1, FOS"
+PBMC_PSA,too_small,2,"CLK4, FRA10AC1"
+PBMC_PSA,too_small,2,"C1orf54, WDFY4"
+PBMC_PSA,too_small,2,"AQR, ZC3H3"
+PBMC_PSA,too_small,2,"EGR1, IER2"
+PBMC_PSA,too_small,2,"EMP1, LMNA"

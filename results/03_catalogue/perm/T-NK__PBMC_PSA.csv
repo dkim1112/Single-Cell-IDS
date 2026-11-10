@@ -1,0 +1,6 @@
+program_id,perm_p_median,perm_p_max,frac_pairs_beat_all_shuffles
+T+NK|PBMC_PSA|P01,0.0,0.0,1.0
+T+NK|PBMC_PSA|P02,0.0,0.0,1.0
+T+NK|PBMC_PSA|P03,0.0,0.0,1.0
+T+NK|PBMC_PSA|P04,0.45,0.9,0.2
+T+NK|PBMC_PSA|P05,0.0,0.1333,0.917

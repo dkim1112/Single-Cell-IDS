@@ -1,0 +1,58 @@
+program_no,n_detections,n_genes,label,category,other_seeds_recovered_of_4,October rerun (seed 0),seed 1,seed 2,seed 3,seed 4,total normalization,cap 8000,threshold -0.05,threshold +0.05
+GP01,9,23,AP-1 / immediate-early activation,stress / possible handling artefact,4,True,True,True,True,True,True,True,True,True
+GP02,2,42,antigen presentation (MHC class II),functional,4,True,True,True,True,True,True,True,True,True
+GP03,1,6,,unlabelled,4,True,True,True,True,True,True,True,False,True
+GP04,3,5,,unlabelled,4,True,True,True,True,True,True,True,True,True
+GP05,1,16,AP-1 / immediate-early activation,stress / possible handling artefact,4,True,True,True,True,True,True,True,False,True
+GP06,1,31,antigen presentation (MHC class II),functional,4,True,True,True,True,True,True,True,True,True
+GP07,1,20,metallothionein / metal and oxidative stress,functional,4,True,True,True,True,True,False,True,False,False
+GP08,3,51,monocyte / macrophage core,cell-identity,4,True,True,True,True,True,True,True,True,True
+GP09,3,5,,unlabelled,4,True,True,True,True,True,True,True,True,True
+GP10,1,5,,unlabelled,4,True,True,True,True,True,False,True,False,False
+GP11,1,25,basal keratinocyte / adhesion to basement membrane,cell-identity,4,True,True,True,True,True,False,True,True,True
+GP12,2,4,metallothionein / metal and oxidative stress,functional,4,True,True,True,True,True,True,True,True,True
+GP13,1,3,,unlabelled,4,True,True,True,True,True,True,True,True,False
+GP14,1,27,,unlabelled,0,True,False,False,False,False,False,False,False,False
+GP15,2,49,T-cell identity / receptor signalling,cell-identity,4,True,True,True,True,True,True,True,True,True
+GP16,2,4,antigen presentation (MHC class II),functional,4,True,True,True,True,True,True,True,True,False
+GP17,1,5,plasmacytoid dendritic cell,cell-identity,2,True,True,False,True,False,True,False,False,True
+GP18,1,3,lymphatic endothelium,cell-identity,2,True,True,False,True,False,False,False,False,False
+GP19,1,9,cytotoxic effector (NK / CD8 / γδ T killing machinery),functional,4,True,True,True,True,True,True,True,False,True
+GP20,1,22,inflammatory chemokine release (MIP-1 / IL-8 axis),functional,4,True,True,True,True,True,True,True,False,False
+GP21,1,14,plasmacytoid dendritic cell,cell-identity,4,True,True,True,True,True,True,True,True,True
+GP22,4,9,antimicrobial / psoriasis keratinocyte response,functional,4,True,True,True,True,True,True,True,True,True
+GP23,2,50,antigen presentation (MHC class II),functional,4,True,True,True,True,True,True,True,False,True
+GP24,1,4,inflammatory chemokine release (MIP-1 / IL-8 axis),functional,4,True,True,True,True,True,True,True,True,True
+GP25,1,40,antigen presentation (MHC class II),functional,4,True,True,True,True,True,True,True,False,True
+GP26,2,4,cytotoxic effector (NK / CD8 / γδ T killing machinery),functional,4,True,True,True,True,True,True,True,True,True
+GP27,1,15,cytotoxic effector (NK / CD8 / γδ T killing machinery),functional,2,True,True,True,False,False,True,True,True,False
+GP28,1,12,cytotoxic effector (NK / CD8 / γδ T killing machinery),functional,4,True,True,True,True,True,True,True,False,True
+GP29,1,3,cytotoxic effector (NK / CD8 / γδ T killing machinery),functional,4,True,True,True,True,True,True,True,True,True
+GP30,1,5,mast cell identity,cell-identity,4,True,True,True,True,True,True,True,True,True
+GP31,1,6,T-cell identity / receptor signalling,cell-identity,3,True,False,True,True,True,True,False,True,True
+GP32,1,3,,unlabelled,4,True,True,True,True,True,True,True,False,True
+GP33,3,42,cytotoxic effector (NK / CD8 / γδ T killing machinery),functional,4,True,True,True,True,True,True,True,True,True
+GP34,1,7,T-cell identity / receptor signalling,cell-identity,4,True,True,True,True,True,False,True,True,True
+GP35,1,16,conventional dendritic cell (cDC2),cell-identity,4,True,True,True,True,True,True,True,True,True
+GP36,1,50,cytotoxic effector (NK / CD8 / γδ T killing machinery),functional,3,True,True,False,True,True,True,True,True,False
+GP37,1,23,T-cell identity / receptor signalling,cell-identity,3,True,True,True,False,True,True,True,True,True
+GP38,2,3,,unlabelled,4,True,True,True,True,True,True,True,True,True
+GP39,1,47,inflammatory chemokine release (MIP-1 / IL-8 axis),functional,1,True,False,False,False,True,False,False,False,False
+GP40,1,5,,unlabelled,4,True,True,True,True,True,False,True,False,False
+GP41,1,3,,unlabelled,0,True,False,False,False,False,True,False,False,False
+GP42,3,50,melanocyte identity / pigmentation,cell-identity,4,True,True,True,True,True,True,True,True,True
+GP43,1,3,mast cell identity,cell-identity,4,True,True,True,True,True,False,True,False,False
+GP44,2,43,smooth muscle / pericyte contractility,cell-identity,4,True,True,True,True,True,True,True,True,True
+GP45,1,4,interferon-stimulated response,functional,4,True,True,True,True,True,True,True,True,False
+GP46,3,13,interferon-stimulated response,functional,4,True,True,True,True,True,True,True,True,True
+GP47,1,3,sweat gland / secretory,cell-identity,4,True,True,True,True,True,True,True,True,True
+GP48,1,4,,unlabelled,4,True,True,True,True,True,True,True,True,True
+GP49,1,4,endothelial activation / leukocyte adhesion,functional,3,True,True,True,False,True,True,True,False,True
+GP50,1,3,,unlabelled,0,True,False,False,False,False,True,False,False,False
+GP51,1,23,sweat gland / secretory,cell-identity,4,True,True,True,True,True,True,True,False,True
+GP52,1,5,,unlabelled,2,True,True,False,True,False,True,False,True,False
+GP53,1,4,cornified envelope / terminal keratinocyte differentiation,functional,4,True,True,True,True,True,False,True,True,False
+GP54,1,3,,unlabelled,4,True,True,True,True,True,False,True,True,False
+GP55,1,41,cornified envelope / terminal keratinocyte differentiation,functional,1,True,False,False,False,True,False,False,True,False
+GP56,1,39,cornified envelope / terminal keratinocyte differentiation,functional,4,True,True,True,True,True,False,True,True,True
+GP57,1,22,cornified envelope / terminal keratinocyte differentiation,functional,0,True,False,False,False,False,False,False,True,False

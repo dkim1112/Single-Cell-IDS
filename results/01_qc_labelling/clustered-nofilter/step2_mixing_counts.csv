@@ -1,0 +1,15 @@
+group,cluster_label,size,mean
+PBMC,B cell,940,0.15
+PBMC,Endothelial,39,10.03
+PBMC,Mast cell,41,8.02
+PBMC,Myeloid cell,3350,0.37
+PBMC,T cell,8394,0.65
+skin,B cell,33,25.76
+skin,Endothelial,3733,0.15
+skin,Fibroblast,9321,0.0
+skin,Keratinocyte,41946,0.0
+skin,Mast cell,1125,0.22
+skin,Melanocyte,1987,0.0
+skin,Myeloid cell,1402,9.55
+skin,Smooth muscle,3356,0.0
+skin,T cell,4464,12.31

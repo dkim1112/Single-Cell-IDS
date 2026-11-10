@@ -1,0 +1,7 @@
+stratum,reason,n_genes,first_genes
+skin_PN,too_small,2,"ASPN, PLXDC1"
+skin_PN,too_small,2,"PODXL, SLC9A3R2"
+skin_PN,too_small,2,"MT1M, MT2A"
+skin_PN,too_small,2,"GATA2, HPGD"
+skin_PN,too_large,130,"ABI3BP, ADH1B, AEBP1, ALDH2"
+skin_PN,too_large,76,"A2M, ACKR1, ACOT7, ADGRL4"

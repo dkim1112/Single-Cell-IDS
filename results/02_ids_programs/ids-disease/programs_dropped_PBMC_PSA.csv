@@ -1,0 +1,4 @@
+stratum,reason,n_genes,first_genes
+PBMC_PSA,too_small,2,"CD8A, CD8B"
+PBMC_PSA,too_large,76,"AIF1, ALDH2, AP1S2, APLP2"
+PBMC_PSA,too_large,103,"ALDH1A1, ALOX5, AOAH, ARHGAP26"

@@ -1,0 +1,10 @@
+program_id,perm_p_median,perm_p_max,frac_pairs_beat_all_shuffles
+whole-tissue|skin_NS|P01,0.0,0.0,1.0
+whole-tissue|skin_NS|P02,0.0,0.0,1.0
+whole-tissue|skin_NS|P03,0.0,0.0,1.0
+whole-tissue|skin_NS|P04,0.0,0.0,1.0
+whole-tissue|skin_NS|P05,0.0,0.0,1.0
+whole-tissue|skin_NS|P06,0.0,0.45,0.917
+whole-tissue|skin_NS|P07,0.0,0.4,0.667
+whole-tissue|skin_NS|P08,0.075,0.3,0.167
+whole-tissue|skin_NS|P09,0.0,0.0,1.0

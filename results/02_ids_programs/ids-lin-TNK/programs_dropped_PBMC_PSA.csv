@@ -1,0 +1,9 @@
+stratum,reason,n_genes,first_genes
+PBMC_PSA,too_small,2,"S100A8, S100A9"
+PBMC_PSA,too_small,2,"RPS4Y1, XIST"
+PBMC_PSA,too_small,2,"DUSP2, GZMK"
+PBMC_PSA,too_small,2,"FGFBP3, KAT2A"
+PBMC_PSA,too_small,2,"DOK1, UTP15"
+PBMC_PSA,too_small,2,"FASN, RP11-452L6.5"
+PBMC_PSA,too_large,121,"ABHD17A, ABI3, ACTB, ACTN4"
+PBMC_PSA,too_large,71,"ABCC10, ADAM15, AHCY, AIFM1"

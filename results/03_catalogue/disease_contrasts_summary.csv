@@ -1,0 +1,8 @@
+tissue,contrast,design,donors_a,donors_b,tests,raw_p_below_0_05,significant,expected_by_chance
+blood,Healthy vs PSA,"CROSS-LANE, not interpretable",16,23,372,132,86,19
+blood,Healthy vs PSO,lanes 03+05 (both groups present),16,8,372,24,0,19
+blood,PSO vs PSA,PBMC-06 lanes (same lanes),6,12,372,22,0,19
+blood,PSO vs PSA,all lanes,14,23,372,56,0,19
+skin,NS vs PN,all skin,7,10,651,206,103,33
+skin,NS vs PP,all skin,7,13,651,330,274,33
+skin,PN vs PP,paired within donor,9,9,651,249,0,33

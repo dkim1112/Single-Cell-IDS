@@ -1,0 +1,5 @@
+stratum,reason,n_genes,first_genes
+skin_PN,too_small,2,"CYP1A1, CYP1B1"
+skin_PN,too_small,2,"SPRR2E, SPRR2G"
+skin_PN,too_small,2,"MUCL1, PI3"
+skin_PN,too_small,2,"MYC, SFN"

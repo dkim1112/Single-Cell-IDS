@@ -1,0 +1,26 @@
+{
+  "resolution": 0.2,
+  "sub_resolution": 0.4,
+  "clusters_by_resolution": {
+    "0.20": 12,
+    "0.40": 15,
+    "0.60": 17,
+    "0.80": 23
+  },
+  "relabelled_cells": 2086,
+  "relabelled_pct": 2.6,
+  "step3": {
+    "kept_labels": [
+      "Myeloid cell",
+      "T cell"
+    ],
+    "cells_before": {
+      "PBMC": 12764,
+      "skin": 67367
+    },
+    "cells_after": {
+      "PBMC": 11744,
+      "skin": 5866
+    }
+  }
+}

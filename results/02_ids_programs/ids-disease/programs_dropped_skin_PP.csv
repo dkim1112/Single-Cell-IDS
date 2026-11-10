@@ -1,0 +1,9 @@
+stratum,reason,n_genes,first_genes
+skin_PP,too_small,2,"HBA2, HBB"
+skin_PP,too_small,2,"CCL3, CCL4"
+skin_PP,too_small,2,"COL4A1, COL4A2"
+skin_PP,too_small,2,"PLAU, PLAUR"
+skin_PP,too_small,2,"CXCL2, CXCL3"
+skin_PP,too_large,93,"ABI3BP, AEBP1, ANPEP, APCDD1"
+skin_PP,too_large,62,"A2M, ACKR1, ADGRL4, AQP1"
+skin_PP,too_large,98,"ALDH2, APOBEC3A, AQP3, ARG1"

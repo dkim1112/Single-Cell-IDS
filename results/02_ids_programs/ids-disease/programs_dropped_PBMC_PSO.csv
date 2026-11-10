@@ -1,0 +1,6 @@
+stratum,reason,n_genes,first_genes
+PBMC_PSO,too_small,2,"CLEC10A, FCER1A"
+PBMC_PSO,too_small,2,"CD8A, CD8B"
+PBMC_PSO,too_small,2,"CDKN1C, HES4"
+PBMC_PSO,too_large,51,"ADAM28, AFF3, ARHGAP24, BANK1"
+PBMC_PSO,too_large,174,"ACSL1, AIF1, ALDH2, ALOX5"

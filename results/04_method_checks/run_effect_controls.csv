@@ -1,0 +1,6 @@
+control,cell_type_level,donors_a,donors_b,tests,raw_p_below_0_05,expected_by_chance,significant,significant_and_change_0_2,largest_abs_change
+PSO donors only: runs 02-05 vs run 06,lineage,17,6,372,143,19,54,4,0.556
+Healthy donors only: run 01 vs runs 02-05,lineage,9,20,372,196,19,162,50,0.944
+PsA donors only: run 01 vs run 06,lineage,9,12,372,186,19,163,17,0.413
+PsA donors only: run 06 vs run 07,lineage,12,5,372,91,19,62,2,0.303
+Healthy donors only: runs 02+04 vs run 05,lineage,11,9,372,121,19,66,9,0.455

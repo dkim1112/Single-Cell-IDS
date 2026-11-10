@@ -1,0 +1,3 @@
+stratum,reason,n_genes,first_genes
+PBMC_Healthy,too_small,2,"CD3E, IL7R"
+PBMC_Healthy,too_small,2,"TMEM176A, TMEM176B"

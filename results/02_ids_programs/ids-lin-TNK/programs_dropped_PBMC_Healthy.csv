@@ -1,0 +1,8 @@
+stratum,reason,n_genes,first_genes
+PBMC_Healthy,too_small,2,"CD8A, CD8B"
+PBMC_Healthy,too_small,2,"IFI44L, IFI6"
+PBMC_Healthy,too_small,2,"TTN, ZC3H12D"
+PBMC_Healthy,too_small,2,"DUSP2, GZMK"
+PBMC_Healthy,too_small,2,"IL11RA, RXRA"
+PBMC_Healthy,too_large,84,"ABHD17A, ADGRG1, ANXA1, APMAP"
+PBMC_Healthy,too_large,80,"ACACA, ACTR5, AHCY, ALG12"

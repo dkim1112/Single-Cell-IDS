@@ -1,0 +1,10 @@
+variant,programs_found,identical_gene_sets,detections_recovered_of_194,kept_detections_recovered_of_88,distinct_programs_recovered_of_57,programs_not_in_october
+October rerun (seed 0),194,194,194,88,57,0
+seed 1,198,113,168,80,50,23
+seed 2,199,110,169,76,47,24
+seed 3,198,110,165,76,48,24
+seed 4,203,111,169,77,49,22
+total normalization,185,46,121,69,43,53
+cap 8000,192,111,165,75,47,20
+threshold -0.05,155,33,96,54,37,48
+threshold +0.05,214,42,119,54,37,76

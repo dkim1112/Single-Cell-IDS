@@ -1,0 +1,6 @@
+program_id,perm_p_median,perm_p_max,frac_pairs_beat_all_shuffles
+whole-tissue|PBMC_PSO|P01,0.0,0.0,1.0
+whole-tissue|PBMC_PSO|P02,0.0,0.0,1.0
+whole-tissue|PBMC_PSO|P03,0.1167,0.4333,0.333
+whole-tissue|PBMC_PSO|P04,0.0,0.0,1.0
+whole-tissue|PBMC_PSO|P05,0.0,0.3333,0.992

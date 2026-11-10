@@ -1,0 +1,10 @@
+stratum,reason,n_genes,first_genes
+skin_PP,too_small,2,"CD74, HLA-DRA"
+skin_PP,too_small,2,"CCL19, NTRK2"
+skin_PP,too_small,2,"MTRNR2L12, MTRNR2L8"
+skin_PP,too_small,2,"IFITM1, LY6E"
+skin_PP,too_small,2,"IFI27, IFI6"
+skin_PP,too_small,2,"GJB2, GJB6"
+skin_PP,too_small,2,"PIP5K1C, WDR54"
+skin_PP,too_large,51,"ACER1, ALOX12B, ARG1, ATP6V1C2"
+skin_PP,too_large,75,"A2ML1, ALDH3A1, ALDH3B2, ANXA1"

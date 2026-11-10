@@ -1,0 +1,7 @@
+group,tissue,n,NK only,T only,both,undetermined,gamma-delta receptor +
+cluster 0,PBMC,1295,774,20,467,34,992
+cluster 0,skin,159,47,22,30,60,121
+cluster 1 (reference),PBMC,4712,0,4567,30,115,208
+cluster 1 (reference),skin,1256,1,1108,8,139,93
+cluster 2 (reference),PBMC,977,0,945,16,16,79
+cluster 2 (reference),skin,2118,1,1940,76,101,302

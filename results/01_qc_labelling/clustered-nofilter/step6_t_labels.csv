@@ -1,0 +1,5 @@
+subcluster,n,label_overall,n_PBMC,top_PBMC,top_PBMC_share,n_skin,top_skin,top_skin_share
+0,1500,NK,1285,NK,84.6,215,yd T cell,67.0
+1,2413,CD8 TEM,1405,CD8 TEM,66.3,1008,Cytotoxic T cell,47.9
+2,3660,CD4 TCM,1612,CD4 TCM,84.4,2048,Naive T cell,45.0
+3,5285,CD4 TCM,4092,CD4 TCM,50.1,1193,Stressed T cell,61.4

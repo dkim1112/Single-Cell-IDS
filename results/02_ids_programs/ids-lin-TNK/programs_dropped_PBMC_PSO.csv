@@ -1,0 +1,5 @@
+stratum,reason,n_genes,first_genes
+PBMC_PSO,too_small,2,"RPS4Y1, XIST"
+PBMC_PSO,too_small,2,"BTBD11, RP5-894A10.2"
+PBMC_PSO,too_large,77,"ABHD17A, ABI3, ACTN4, ADGRG1"
+PBMC_PSO,too_large,69,"ADHFE1, AKT1S1, ALG12, ALKBH4"

@@ -1,0 +1,3 @@
+lineage,cells,theta,clusters,skin_nbrs_from_PBMC_before,skin_nbrs_from_PBMC_after,PBMC_nbrs_from_skin_after,subtype_purity_before,subtype_purity_after,labels
+Myeloid cell,4752,8.0,7,0.54,6.98,0.29,0.946,0.944,"CD14 Mono, CD16 Mono, LC, cDC2B"
+T cell,12858,8.0,4,2.38,17.44,1.68,0.63,0.625,"CD4 TCM, CD8 TEM, NK"

@@ -1,6 +1,0 @@
-leiden_res_0.40,B intermediate,B memory,B naive,CD4 CTL,CD4 Naive,CD4 Proliferating,CD4 TCM,CD4 TEM,CD8 Naive,CD8 Proliferating,CD8 TCM,CD8 TEM,Cytotoxic T cell,Eccrine gland,Eryth,IFN T cell,ILC,MAIT,Mast cell,NK,NK Proliferating,NK_CD56bright,Naive T cell,Platelet,Stressed T cell,Tc17 cell,Treg,dnT,gdT,pDC,yd T cell
-0,4,2,4,170,0,0,28,39,1,1,28,904,455,0,0,11,0,36,0,35,0,2,139,8,169,262,3,1,87,0,10
-1,0,0,0,0,0,5,7,0,0,1,0,0,2,0,0,0,0,0,0,0,0,0,94,0,78,9,4,0,0,0,10
-2,11,7,19,0,85,2,1793,85,37,0,28,13,4,0,0,40,3,6,0,0,0,0,850,7,684,160,604,16,7,3,3
-3,0,0,1,1,1144,0,1633,37,479,0,37,9,7,1,2,17,0,3,0,0,0,0,47,0,476,10,378,11,17,0,1
-4,6,0,2,11,0,0,1,0,0,0,1,66,58,0,0,2,3,4,1,1085,20,85,24,11,15,18,0,0,18,0,142

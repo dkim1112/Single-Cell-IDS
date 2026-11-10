@@ -1,0 +1,12 @@
+program_id,perm_p_median,perm_p_max,frac_pairs_beat_all_shuffles
+Myeloid|PBMC_PSO|P01,0.0,0.8333,0.667
+Myeloid|PBMC_PSO|P02,0.0,0.0,1.0
+Myeloid|PBMC_PSO|P03,0.0,0.0,1.0
+Myeloid|PBMC_PSO|P04,0.0,0.0,1.0
+Myeloid|PBMC_PSO|P05,0.0,0.0,1.0
+Myeloid|PBMC_PSO|P06,0.0,0.0,1.0
+Myeloid|PBMC_PSO|P07,0.0,0.0,1.0
+Myeloid|PBMC_PSO|P08,0.0,0.0,1.0
+Myeloid|PBMC_PSO|P09,0.0,0.0,1.0
+Myeloid|PBMC_PSO|P10,0.0,0.0,1.0
+Myeloid|PBMC_PSO|P11,0.0,0.55,0.992

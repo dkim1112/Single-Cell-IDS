@@ -1,0 +1,6 @@
+stratum,reason,n_genes,first_genes
+PBMC_Healthy,too_small,2,"CLEC10A, FCER1A"
+PBMC_Healthy,too_small,2,"DUSP1, FOS"
+PBMC_Healthy,too_small,2,"MT-CO1, MT-CO2"
+PBMC_Healthy,too_small,2,"CD8A, CD8B"
+PBMC_Healthy,too_large,93,"AIF1, ALDH2, AP1S2, APLP2"

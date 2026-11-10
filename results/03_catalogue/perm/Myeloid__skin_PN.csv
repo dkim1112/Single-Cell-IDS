@@ -1,0 +1,4 @@
+program_id,perm_p_median,perm_p_max,frac_pairs_beat_all_shuffles
+Myeloid|skin_PN|P01,0.0,0.0,1.0
+Myeloid|skin_PN|P02,0.2333,1.0,0.143
+Myeloid|skin_PN|P03,0.3583,1.0,0.074

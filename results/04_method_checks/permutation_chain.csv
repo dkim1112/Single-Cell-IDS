@@ -1,0 +1,6 @@
+rule,non_technical,pass_permutation,kept_detections,distinct_programs,kept_in_october_but_not_here,kept_here_but_not_in_october
+"October: 60 shuffles, >= 90% of pairs beat all 60",148,90,88,57,0,0
+"200 shuffles, >= 90% of pairs with p < 0.01",148,91,88,56,1,1
+"200 shuffles, >= 90% of pairs beat all 200",148,85,84,53,4,0
+"200 shuffles, every pair with p < 0.01",148,75,73,45,16,1
+"200 shuffles, >= 90% of pairs with p < 0.05",148,100,92,60,0,4

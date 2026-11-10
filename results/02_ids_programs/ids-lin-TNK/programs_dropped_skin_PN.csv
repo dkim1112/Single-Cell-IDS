@@ -1,0 +1,10 @@
+stratum,reason,n_genes,first_genes
+skin_PN,too_small,2,"HBA2, HBB"
+skin_PN,too_small,2,"RECQL, THAP3"
+skin_PN,too_small,2,"KRT1, KRT10"
+skin_PN,too_large,52,"ABCB7, AC017002.1, ANKRD26, ANKRD36"
+skin_PN,too_large,66,"ABCC10, AC009133.12, ADAM15, AHCY"
+skin_PN,too_large,87,"ALOX12-AS1, ANAPC2, ANAPC7, APAF1"
+skin_PN,too_large,85,"ABCA7, ABCC5, AC002117.1, AC159540.1"
+skin_PN,too_large,120,"ACTR5, ADAT2, ALKBH4, APOBEC3H"
+skin_PN,too_large,57,"ABI3, AC004951.6, ACSL5, ATP2B4"

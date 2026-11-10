@@ -1,0 +1,9 @@
+programs,n_programs,cell_type_level,comparison,lanes,donors_a,donors_b,groups,tests,raw_p_below_0_05,expected_by_chance,significant,significant_and_change_0_2,programs_significant,smallest_possible_p,largest_abs_change,median_detectable_change
+all 268 variant programs,268,lineage,Healthy vs PSO,more lanes: all 16 lanes of runs 02-05,20,17,4,1072,73,54,0,0,0,1.2574370556669729e-10,0.231,0.023
+all 268 variant programs,268,lineage,PSO vs PSA,more lanes: runs 06 + 07 (8 lanes),7,17,4,1072,37,54,0,0,0,5.778609897603032e-06,0.134,0.024
+all 268 variant programs,268,subtype,Healthy vs PSO,more lanes: all 16 lanes of runs 02-05,20,17,9,2412,277,121,0,0,0,1.2574370556669729e-10,0.407,0.032
+all 268 variant programs,268,subtype,PSO vs PSA,more lanes: runs 06 + 07 (8 lanes),7,17,7,1876,77,94,0,0,0,5.778609897603032e-06,0.23,0.03
+non-technical only,263,lineage,Healthy vs PSO,more lanes: all 16 lanes of runs 02-05,20,17,4,1052,73,53,0,0,0,1.2574370556669729e-10,0.231,0.022
+non-technical only,263,lineage,PSO vs PSA,more lanes: runs 06 + 07 (8 lanes),7,17,4,1052,37,53,0,0,0,5.778609897603032e-06,0.134,0.023
+non-technical only,263,subtype,Healthy vs PSO,more lanes: all 16 lanes of runs 02-05,20,17,9,2367,272,118,0,0,0,1.2574370556669729e-10,0.407,0.031
+non-technical only,263,subtype,PSO vs PSA,more lanes: runs 06 + 07 (8 lanes),7,17,7,1841,76,92,0,0,0,5.778609897603032e-06,0.23,0.029
