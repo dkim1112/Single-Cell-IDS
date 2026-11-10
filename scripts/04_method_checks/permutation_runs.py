@@ -1,7 +1,7 @@
 """
 permutation_runs.py — the authors' permutation test with more shuffles.
 
-Same procedure as program_catalogue.permutation_pvalues (authors' ids.compute_IDS(p_val=True) on
+Same procedure as scripts/03_catalogue/program_catalogue.py (authors' ids.compute_IDS(p_val=True) on
 the union of each search's program genes, up to 4,000 cells drawn with the same seed, library
 size over all genes, [0,8] scaling), with the number of shuffles as a parameter. October used 60;
 the authors' default is 100.

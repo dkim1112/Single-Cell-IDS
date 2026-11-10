@@ -23,7 +23,8 @@ src/
     ├── programs.py       program ranking rule + cell-type enrichment
     ├── celltypes.py      granular subtype → main cell type
     ├── viz.py            PCA → Harmony → UMAP, Leiden, plots
-    ├── units.py          one file per lane / sample, lane-by-lane scoring (matches scanpy)
+    ├── units.py          the data as one file per lane / sample; lane-by-lane scoring (matches scanpy)
+    ├── discovery.py      program discovery on those files: sampling, gene panel, IDS, programs
     ├── datasets/         per-dataset particulars (see below)
     └── resources/        cell-type mapping files, one per dataset
 scripts/                  analysis scripts, one folder per pipeline stage (see "Pipeline" below)
@@ -93,25 +94,25 @@ Scripts are numbered by stage. Each stage reads the one before it and writes onl
 | Stage | Run in this order | Writes to | What it does |
 |---|---|---|---|
 | `01_qc_labelling` | `qc_joint_pipeline` → `cluster_pipeline` → `theta_tuning` → `rank_markers` → `nk_percell`, `nk_deg_export`, `nk_deg_workbook` | `results/01_qc_labelling/` | QC both tissues, align blood and skin on a UMAP, label T/NK and myeloid sub-clusters, check the NK call. Blood: lane PBMC-01-1 only. |
-| `02_ids_programs` | `build_disease_object` → `ids_programs_disease` (whole tissue, then `--lineage T+NK`, `Myeloid`, `Keratinocyte`) → `ids_program_atlas` | `results/02_ids_programs/` | Build the blood + skin object with disease state (9 blood lanes), find IDS programs in each tissue × disease stratum, say where each is expressed. |
+| `02_ids_programs` | `build_units` (blood, skin, then each with `--index`) → `ids_programs_disease` (whole tissue, then `--lineage T+NK`, `Myeloid`, `Keratinocyte`; each once to see the IDS percentiles, then `--reuse --min-ids`) | `results/02_ids_programs/`, data files in `results/00_units/` | Write one QC'd file per blood lane (all 28) and per skin sample, then find IDS programs in each tissue × disease stratum. The catalogue uses the nine October lanes. |
 | `03_catalogue` | `program_catalogue` → `disease_contrasts` → `distinct_programs` → `catalogue_workbook` (`keratinocyte_detection` is independent) | `results/03_catalogue/`, `deliverables/` | Permutation test, activity score, merge 194 detections into distinct programs, donor-level disease tests, the workbook. |
-| `04_method_checks` | `build_units` → `score_units` → `disease_tests`; `discovery_runs` → `discovery_compare` → `variant_blood_tests`; `permutation_runs` | `results/04_method_checks/` | One file per lane (memory stays at one lane), all 28 blood lanes, and the checks on donors, cell-type level, discovery choices and shuffle count. Summary: `results/04_method_checks/README.md`. |
+| `04_method_checks` | `validate_scoring`; `score_units` → `disease_tests`; `discovery_runs` → `discovery_compare` → `variant_blood_tests`; `permutation_runs` | `results/04_method_checks/` | The same pipeline with one choice changed at a time: all 28 lanes (more donors), subtype-level tests, other random samples / normalization / cap / threshold, 200 shuffles. Summary: `results/04_method_checks/README.md`. |
 
 Which lanes are used and why: `docs/data_inventory.md`. Old paths: `docs/path_map.md`.
 
-### Which data layout to use
+### Data layout: one file per lane, everywhere
 
-There are two, and they hold exactly the same cells (checked cell for cell, November 2026).
+Stages 02, 03 and 04 all read the same files: one QC'd file per blood lane and per skin sample, written by
+`scripts/02_ids_programs/build_units.py` and read through `sc_ids.units`. No script loads a whole tissue, so
+peak memory is set by the largest single lane (about 2.4 GB at the highest point, the gene-panel step) and does
+not grow when lanes are added. Scoring is done lane by lane and matches scanpy on a merged object to rounding
+error (`scripts/04_method_checks/validate_scoring.py`).
 
-| Layout | Built by | Read by | Memory |
-|---|---|---|---|
-| **One file per lane / sample (use this)** | `scripts/04_method_checks/build_units.py` | stage 04, through `sc_ids.units` | about 1.5 GB to build, whatever the number of lanes |
-| One merged object per tissue (older) | `scripts/02_ids_programs/build_disease_object.py` | stages 02 and 03 | grows with every lane; the nine-lane blood build was killed at 6 GB |
+The switch from merged objects (November 2026) changed no result: gene panels, all 194 detections, the
+catalogue, donor means and every disease test were reproduced from the per-lane files.
 
-Start new work from the per-lane layout: it covers all 28 blood lanes, and its scoring matches scanpy on the
-merged object to rounding error (`scripts/04_method_checks/validate_scoring.py`). Stages 02 and 03 still read
-the merged objects and have not been ported yet. Their saved outputs in `results/` were reproduced exactly from
-the per-lane files, so nothing has to be rebuilt to use them.
+Stage 01 is the one exception. Harmony and UMAP need every cell in one object, so that stage still builds
+its own merged, embedded object for the lanes it covers.
 
 ## Two representations, on purpose
 

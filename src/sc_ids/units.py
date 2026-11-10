@@ -21,8 +21,10 @@ import pandas as pd
 import scipy.sparse as sp
 from . import paths
 
-WORK = os.environ.get("SC_IDS_WORK") or os.path.join(paths.RESULTS, "00_units")
+WORK = paths.UNITS
 TISSUES = ("blood", "skin")
+# disease label shared by the two tissues; the source label is kept as disease_fine
+DISEASE = {"Healthy": "healthy", "PSO": "psoriasis", "PSA": "PsA", "NS": "healthy", "PN": "psoriasis", "PP": "psoriasis"}
 
 
 def unit_path(tissue, unit):
@@ -126,3 +128,24 @@ def score_matrix(X_lognorm, ctrl):
         v += [1.0 / len(gi)] * len(gi) + [-1.0 / len(ci)] * len(ci)
     W = sp.csc_matrix((v, (r, c)), shape=(G, len(ids)), dtype=np.float64)
     return np.asarray((X_lognorm.astype(np.float64) @ W).todense()), ids
+
+
+def stage_units(tissue, lanes=None):
+    """Units a catalogue stage works on: the nine October blood lanes unless lanes='all'; every skin sample."""
+    from .datasets.gse194315 import LANES_USED
+    if tissue == "blood" and lanes != "all":
+        return list(lanes or LANES_USED)
+    return list(cells(tissue)["unit"].unique())
+
+
+def iter_scores(tissue, programs, unit_list=None, cache=None):
+    """Score `programs` ({id: [genes]}) in every cell, one unit at a time.
+    Yields (unit, obs, S, ids): S is cells x programs for that unit, equal to what sc.tl.score_genes
+    (ctrl_size 50, random_state 0) gives on the merged object of all `unit_list` units."""
+    unit_list = list(unit_list) if unit_list is not None else stage_units(tissue)
+    mean, _ = gene_means(tissue, unit_list, cache=cache)
+    ctrl = control_sets(genes(tissue), mean, programs)
+    for u in unit_list:
+        a = read_unit(tissue, u)
+        S, ids = score_matrix(lognorm(a.X), ctrl)
+        yield u, a.obs, S, ids

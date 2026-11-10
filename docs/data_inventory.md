@@ -15,7 +15,7 @@ over a donor's cells across lanes first.
 
 Counts are after our filters (source study's `IncludedInStudy`, demuxlet singlets, Healthy / PSO / PsA donors only,
 min 200 genes, max 10% mitochondrial, platelets and erythrocytes removed). Defined in
-`sc_ids.datasets.gse194315.LANES_USED`, loaded by `scripts/02_ids_programs/build_disease_object.py`.
+`sc_ids.datasets.gse194315.LANES_USED`. Every lane is built by `scripts/02_ids_programs/build_units.py`; the catalogue reads these nine.
 
 | Lane | Cells | Donors | Healthy | PSO | PsA | What it is for |
 |---|---:|---:|---:|---:|---:|---|
@@ -41,7 +41,7 @@ How the lanes map to the blood disease tests (`scripts/03_catalogue/disease_cont
 
 ### All 28 lanes after QC (built November 10)
 
-Every lane now has its own QC'd file (`scripts/04_method_checks/build_units.py`), with the same filters as the nine above.
+Every lane now has its own QC'd file (`scripts/02_ids_programs/build_units.py`), with the same filters as the nine above.
 Antibody rows are dropped before QC: lanes from run 02 onward carry 282 antibody features, and counting them in a cell's
 total lowers its mitochondrial share and lets extra cells through. Donor columns count donors with at least one cell in the lane.
 

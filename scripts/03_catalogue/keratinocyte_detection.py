@@ -6,17 +6,15 @@ non-lesional cells. Per-gene donor tests are unadjusted and exploratory.
 Writes results/03_catalogue/keratinocyte_detection.csv
 """
 import os, sys
-import numpy as np, pandas as pd, anndata as ad
+import numpy as np, pandas as pd
 from scipy import stats
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "src"))
-from sc_ids import paths                                                      # noqa: E402
+from sc_ids import paths, units                                               # noqa: E402
 from sc_ids.lineage import LINEAGE                                           # noqa: E402
 LIN = LINEAGE
-a = ad.read_h5ad(os.path.join(paths.DISEASE_RUN, "skin_qc.h5ad"), backed="r")
 genes = ["S100A7", "S100A8", "S100A9", "DSC1", "DSG1"]
-idx = [a.var_names.get_loc(g) for g in genes]
-X = a.X[:, idx]; X = X.toarray() if hasattr(X, "toarray") else np.asarray(X)
-o = a.obs[["donor", "subtype", "disease_fine"]].copy()
+o = units.cells("skin")                                    # every skin cell, read sample by sample
+X = units.read_cells("skin", o, genes).toarray()
 k = (o.subtype.astype(str).map(LIN) == "Keratinocyte").values
 D = pd.DataFrame(X[k] > 0, columns=genes)
 D["any_S100A7/8/9"] = D[["S100A7", "S100A8", "S100A9"]].any(axis=1)
@@ -37,5 +35,5 @@ for g in cols:
                          median_donor_pct_NS=med.loc["NS", g], median_donor_pct_b=med.loc[b, g],
                          p_unadjusted=stats.mannwhitneyu(x, y).pvalue))
 out = pd.DataFrame(rows).round(4)
-out.to_csv(os.path.join(paths.CATALOGUE, "keratinocyte_detection.csv"), index=False)
+out.to_csv(os.environ.get("KC_OUT") or os.path.join(paths.CATALOGUE, "keratinocyte_detection.csv"), index=False)
 print(n.to_dict()); print(out.to_string(index=False))

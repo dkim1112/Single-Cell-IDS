@@ -34,18 +34,19 @@ reflect ambient RNA, library composition or donor sex rather than disease. Note
 in particular that removing platelet-ANNOTATED cells does not remove platelet
 ambient transcripts, which still form a coherent programme inside T cells.
 
+DATA. Cells are read from the per-lane files (scripts/02_ids_programs/build_units.py) through
+sc_ids.units, one lane at a time; blood uses the nine October lanes.
+
 Usage:
   python scripts/03_catalogue/program_catalogue.py --out results/03_catalogue
 """
 import argparse, glob, os, sys
 import numpy as np
 import pandas as pd
-import scanpy as sc
-import anndata as ad
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "src"))
 import ids                                                          # noqa: E402
-from sc_ids import paths                                            # noqa: E402
+from sc_ids import paths, units, discovery                          # noqa: E402
 from sc_ids.lineage import LINEAGE                                  # noqa: E402
 
 ANALYSES = {"whole-tissue": paths.DISEASE_RUN, **paths.LINEAGE_RUNS}
@@ -129,12 +130,13 @@ def load_all():
 
 
 def permutation_pvalues(rows, out, n_tests=100):
-    """Authors' permutation test, per stratum, on the union of programme genes.
+    """Authors' permutation test, per search, on the union of its programme genes.
 
-    CHECKPOINTED. This environment recycles the container roughly every 20 minutes,
-    so any step that cannot finish inside that window never finishes at all. Each
-    stratum writes its own file and is skipped if that file already exists, so a
-    restart resumes instead of starting over.
+    Cells come from the per-lane files: the search's stratum (and lineage), at most 4,000 of them
+    (seed 0), library size over all genes, then the same [0,8] scaling as discovery.
+    CHECKPOINTED: each search writes its own file under perm/ and is skipped if that file exists.
+    The catalogue's files were made with 60 shuffles; scripts/04_method_checks/permutation_runs.py
+    repeats the test with 200 and reaches the same selection (56 vs 57 distinct programmes).
     """
     pdir = os.path.join(out, "perm")
     os.makedirs(pdir, exist_ok=True)
@@ -159,28 +161,14 @@ def permutation_pvalues(rows, out, n_tests=100):
         print(f"  [perm] all {len(by)} strata already done", flush=True)
         return
     print(f"  [perm] {len(todo)} strata to do, {len(by) - len(todo)} cached", flush=True)
-    src = {}
     for (analysis, stratum), rs in [(k, by[k]) for k in todo]:
-        t = "PBMC" if stratum.startswith("PBMC") else "skin"
-        if t not in src:
-            src[t] = ad.read_h5ad(paths.DISEASE_RUN + "/"
-                                  + ("blood_qc.h5ad" if t == "PBMC" else "skin_qc.h5ad"))
-            if src[t].X.dtype != np.float32:
-                src[t].X = src[t].X.astype(np.float32)
-            sc.pp.normalize_total(src[t], target_sum=1e4)
-        a = src[t]
-        m = (a.obs["stratum"].astype(str) == stratum).values
-        if analysis != "whole-tissue":
-            want = set(analysis.split("+"))
-            lin = a.obs["subtype"].astype(str).map(LINEAGE).fillna("Other")
-            m &= lin.isin(want).values
-        genes = sorted({g for r in rs for g in r["_genes"]})
-        genes = [g for g in genes if g in a.var_names]
-        idx = np.where(m)[0]
-        if len(idx) > 4000:
-            idx = np.random.default_rng(0).choice(idx, 4000, replace=False)
-        X = a[idx][:, genes].X
-        X = np.asarray(X.todense() if hasattr(X, "todense") else X, dtype=np.float64)
+        tissue, c = discovery.stratum_cells(None if analysis == "whole-tissue" else analysis, stratum)
+        pos = np.arange(len(c))
+        if len(pos) > 4000:
+            pos = np.random.default_rng(0).choice(pos, 4000, replace=False)
+        present = set(units.genes(tissue))
+        genes = sorted({g for r in rs for g in r["_genes"] if g in present})
+        X = np.asarray(units.read_cells(tissue, c.iloc[pos], genes, norm="total").todense(), dtype=np.float64)
         lo, span = X.min(0, keepdims=True), X.max(0, keepdims=True) - X.min(0, keepdims=True)
         X = (X - lo) / np.where(span == 0, 1, span) * 8.0      # same [0,8] as discovery
         C, Pv = ids.compute_IDS(X, num_terms=6, p_norm="max", p_val=True,
@@ -191,8 +179,7 @@ def permutation_pvalues(rows, out, n_tests=100):
             if len(gi) < 2:
                 continue
             sub = Pv[np.ix_(gi, gi)]
-            iu = np.triu_indices_from(sub, k=1)
-            vals = sub[iu]
+            vals = sub[np.triu_indices_from(sub, k=1)]
             r["perm_p_median"] = round(float(np.median(vals)), 4)
             r["perm_p_max"] = round(float(vals.max()), 4)
             r["frac_pairs_beat_all_shuffles"] = round(float((vals < 0.01).mean()), 3)
@@ -202,59 +189,42 @@ def permutation_pvalues(rows, out, n_tests=100):
                        "frac_pairs_beat_all_shuffles": r.get("frac_pairs_beat_all_shuffles")}
                       for r in rs]).to_csv(cpath(analysis, stratum), index=False)
         print(f"  [perm] {analysis} {stratum}: {len(genes)} genes, "
-              f"{len(rs)} programmes \u2192 cached", flush=True)
-    del src
+              f"{len(rs)} programmes → cached", flush=True)
 
 
-def score_and_summarise(rows, out, block=40):
-    """Also checkpointed: each tissue writes its summary once computed, and within
-    a tissue the programmes are scored in blocks so a restart loses one block."""
+def score_and_summarise(rows, out):
+    """Score every programme in every cell, lane by lane, and summarise by lineage, subtype and
+    disease state. Only group sums are kept in memory (never the cells x programmes matrix).
+    Each tissue's summary is cached once computed."""
+    progs = {r["program_id"]: r["_genes"] for r in rows}
     long = []
-    for tag, f in (("blood", os.path.join(paths.DISEASE_RUN, "blood_qc.h5ad")),
-                   ("skin", os.path.join(paths.DISEASE_RUN, "skin_qc.h5ad"))):
+    for tag in ("blood", "skin"):
         cp = os.path.join(out, f"activity_{tag}.csv.gz")
         if os.path.exists(cp):
             print(f"  [score] {tag}: cached", flush=True)
             long.append(pd.read_csv(cp))
             continue
-        a = ad.read_h5ad(f)
-        if a.X.dtype != np.float32:
-            a.X = a.X.astype(np.float32)
-        sc.pp.normalize_total(a, target_sum=1e4)
-        sc.pp.log1p(a)
-        names, scores = [], {}
-        for i, r in enumerate(rows):
-            g = [x for x in r["_genes"] if x in a.var_names]
-            if len(g) < 2:
-                continue
-            sc.tl.score_genes(a, g, score_name="_s", ctrl_size=50, random_state=0)
-            scores[r["program_id"]] = a.obs.pop("_s").values
-            names.append(r["program_id"])
-            if (i + 1) % block == 0:
-                print(f"  [score] {tag}: {len(names)} programmes so far", flush=True)
-        for p, v in scores.items():
-            a.obs[p] = v
-        del scores
-        print(f"  [score] {tag}: {len(names)} programmes", flush=True)
-        o = a.obs
-        lin = o["subtype"].astype(str).map(LINEAGE).fillna("Other")
-        key = pd.DataFrame({"lineage": lin.values,
-                            "subtype": o["subtype"].astype(str).values,
-                            "disease": o["disease"].astype(str).values,
-                            "donor": o["donor"].astype(str).values})
+        acc = {ax: None for ax in ("lineage", "subtype", "disease")}
+        for u, o, S, ids_ in units.iter_scores(tag, progs):
+            sub = o["subtype"].astype(str)
+            lab = {"lineage": sub.map(LINEAGE).fillna("Other").values, "subtype": sub.values,
+                   "disease": o["disease_fine"].astype(str).map(units.DISEASE).values}
+            for ax, v in lab.items():
+                g = pd.DataFrame(S, columns=ids_).groupby(v, observed=True)
+                part = pd.concat({"sum": g.sum(), "pos": pd.DataFrame(S > 0, columns=ids_).groupby(v, observed=True).sum()}, axis=1)
+                part[("n", "n")] = g.size()
+                acc[ax] = part if acc[ax] is None else acc[ax].add(part, fill_value=0)
+        print(f"  [score] {tag}: {len(ids_)} programmes", flush=True)
         this = []
-        for p in names:
-            key["s"] = a.obs[p].values
-            for axis, cols in (("lineage", ["lineage"]), ("subtype", ["subtype"]),
-                               ("disease", ["disease"])):
-                g = key.groupby(cols, observed=True)["s"].agg(
-                    ["mean", "size", lambda x: (x > EXPRESSING).mean()])
-                g.columns = ["mean_score", "n_cells", "prop_expressing"]
-                g = g[g["n_cells"] >= MIN_CELLS].reset_index()
-                g["program_id"], g["tissue"], g["axis"] = p, tag, axis
-                g = g.rename(columns={cols[0]: "group"})
+        for p in ids_:
+            for ax in ("lineage", "subtype", "disease"):
+                a = acc[ax].sort_index()
+                n = a[("n", "n")]
+                g = pd.DataFrame({"group": a.index, "mean_score": (a[("sum", p)] / n).values,
+                                  "n_cells": n.values.astype(int), "prop_expressing": (a[("pos", p)] / n).values})
+                g = g[g["n_cells"] >= MIN_CELLS]
+                g["program_id"], g["tissue"], g["axis"] = p, tag, ax
                 this.append(g)
-        del a
         T = pd.concat(this, ignore_index=True)
         T.to_csv(cp, index=False, compression="gzip")      # checkpoint this tissue
         print(f"  [score] {tag}: cached to {cp}", flush=True)

@@ -17,3 +17,11 @@ Older reports and notes refer to the old paths on the left. Nothing was renamed 
 | Everything else listed in `_archive/MANIFEST.md` | `_archive/<same relative path>` |
 
 Code no longer hardcodes any of these: it reads them from `src/sc_ids/paths.py`.
+
+## November 2026: one data layout
+
+| Before | Now |
+|---|---|
+| `scripts/02_ids_programs/build_disease_object.py` (one merged object per tissue: `blood_qc.h5ad`, `skin_qc.h5ad`) | `scripts/02_ids_programs/build_units.py` (one file per lane / sample under `results/00_units/`, read through `sc_ids.units`) |
+| discovery code inside `ids_programs_disease.py` | `src/sc_ids/discovery.py`, shared by stage 02 and stage 04 |
+| `scripts/02_ids_programs/ids_program_atlas.py`, `results/02_ids_programs/ids-atlas` | archived: superseded by stage 03, and its disease tests counted each lane as a separate donor |

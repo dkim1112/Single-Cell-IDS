@@ -20,8 +20,9 @@ Designs, and what each can support
   skin   NS vs PN, NS vs PP, PN vs PP (paired within donor). Each skin donor is
          one sample, so no collapsing is needed.
 
-Scoring (slow, needs the full matrices) is cached in donor_means.csv.gz; delete that
-file to rescore.
+Scoring reads every cell, lane by lane, from the per-lane files and is cached in
+donor_means.csv.gz; delete that file to rescore. These tests use the nine October lanes;
+scripts/04_method_checks/disease_tests.py repeats them with all 28 lanes and at subtype level.
 """
 import os, sys
 import numpy as np
@@ -47,39 +48,33 @@ def bh(p):
     return np.clip(adj, 0, 1)
 
 
-def score_donors(cat):
-    """Score every biological, significant programme per cell, then average per
-    donor x lineage x disease x lane. Cached because it needs both full matrices."""
-    import scanpy as sc, anndata as ad
+def score_donors(cat, cache=CACHE):
+    """Score every biological, significant programme per cell, lane by lane (sc_ids.units), and keep
+    the mean per donor x lineage x disease x lane. Blood uses the nine October lanes; a skin donor's
+    cells are pooled over that donor's samples of the same state. Cached because it reads every cell."""
+    from sc_ids import units
     keep = cat[cat.technical_flag.isna() & (cat["frac_pairs_beat_all_shuffles"] >= 0.9)]
     progs = {r.program_id: [g.strip() for g in r.genes.split(",")] for r in keep.itertuples()}
     rows = []
-    for tag, f in (("blood", os.path.join(paths.DISEASE_RUN, "blood_qc.h5ad")),
-                   ("skin", os.path.join(paths.DISEASE_RUN, "skin_qc.h5ad"))):
-        a = ad.read_h5ad(f)
-        sc.pp.normalize_total(a, target_sum=1e4); sc.pp.log1p(a)
-        names = []
-        for p, g in progs.items():
-            g = [x for x in g if x in a.var_names]
-            if len(g) < 2:
-                continue
-            sc.tl.score_genes(a, g, score_name=p, ctrl_size=50, random_state=0)
-            names.append(p)
-        o = a.obs
-        key = pd.DataFrame({"donor": o["donor"].astype(str).values,
-                            "lineage": o["subtype"].astype(str).map(LINEAGE).fillna("Other").values,
-                            "disease": o["disease_fine"].astype(str).values,
-                            "lane": o["lane"].astype(str).values if "lane" in o else tag})
-        for p in names:
-            key["s"] = a.obs[p].values
-            g = (key.groupby(["donor", "lineage", "disease", "lane"], observed=True)["s"]
-                    .agg(["mean", "size"]).reset_index())
-            g = g[g["size"] >= MIN_CELLS]
+    for tag in ("blood", "skin"):
+        acc = None
+        for u, o, S, ids_ in units.iter_scores(tag, progs):
+            key = pd.DataFrame({"donor": o["donor"].astype(str).values,
+                                "lineage": o["subtype"].astype(str).map(LINEAGE).fillna("Other").values,
+                                "disease": o["disease_fine"].astype(str).values,
+                                "lane": u if tag == "blood" else tag})
+            g = pd.DataFrame(S, columns=ids_).groupby([key[c].values for c in key.columns], observed=True)
+            part = g.sum(); part["_n"] = g.size()
+            acc = part if acc is None else acc.add(part, fill_value=0)
+        acc.index.names = ["donor", "lineage", "disease", "lane"]
+        acc = acc[acc["_n"] >= MIN_CELLS].sort_index()
+        for p in ids_:
+            g = pd.DataFrame({"score": (acc[p] / acc["_n"]).values, "n_cells": acc["_n"].values.astype(int)},
+                             index=acc.index).reset_index()
             g["program_id"], g["tissue"] = p, tag
-            rows.append(g.rename(columns={"mean": "score", "size": "n_cells"}))
-        del a
+            rows.append(g)
     D = pd.concat(rows, ignore_index=True)
-    D.to_csv(CACHE, index=False, compression="gzip")
+    D.to_csv(cache, index=False, compression="gzip")
     return D
 
 

@@ -35,7 +35,7 @@ def jac(a, b):
 def variant_programs(seed=0, norm="panel", cap=4000, dthr=0.0):
     rows = []
     for an in D.RUNS:
-        for s in pd.read_csv(os.path.join(D.RUNS[an], "ids_summary.csv")).stratum:
+        for s in D.strata_of(an):
             C, info = D.ids_matrix(an, s, seed, norm, cap=cap)
             if C is None:
                 continue

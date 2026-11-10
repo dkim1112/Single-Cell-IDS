@@ -51,7 +51,7 @@ GSE194315 = register(Dataset(
 ))
 
 
-# The 9 of the 28 lanes used for the disease analysis (scripts/02_ids_programs/build_disease_object.py).
+# The 9 of the 28 lanes used for the catalogue (all 28 are built by scripts/02_ids_programs/build_units.py).
 # Donor counts are per lane after the filters in that script; each lane pools several donors, and the
 # same donor appears in more than one lane. Full table and the lanes NOT used: docs/data_inventory.md.
 LANES_USED = {

@@ -8,6 +8,7 @@
 Override the locations with environment variables when the data live elsewhere:
   SC_IDS_DATA       folder holding GSE194315_* and GSE173706_*  (default: <repo>/data)
   SC_IDS_PBMC_DIR   folder holding the PBMC-0X-Y.{barcodes,features,matrix} files
+  SC_IDS_WORK       where the per-lane data files are written     (default: <repo>/results/00_units)
 """
 import os
 
@@ -30,9 +31,11 @@ CATALOGUE = os.path.join(RESULTS, "03_catalogue")   # filtered, merged, annotate
 DELIVERABLES = os.path.join(ROOT, "deliverables")
 
 # ---- named runs inside the stages
-DISEASE_RUN = os.path.join(IDS, "ids-disease")      # whole-tissue run: blood_qc.h5ad, skin_qc.h5ad, programs_*.csv
+DISEASE_RUN = os.path.join(IDS, "ids-disease")      # whole-tissue run: gene panel, IDS summary, programs_*.csv
 LINEAGE_RUNS = {"T+NK": os.path.join(IDS, "ids-lin-TNK"),
                 "Myeloid": os.path.join(IDS, "ids-lin-MY"),
                 "Keratinocyte": os.path.join(IDS, "ids-lin-KC")}
-ATLAS_RUN = os.path.join(IDS, "ids-atlas")
-SKIN_CACHE = os.path.join(IDS, "skin_raw.h5ad")
+
+# ---- the data itself: one QC'd file per blood lane / skin sample (scripts/02_ids_programs/build_units.py).
+# Gitignored and rebuilt in minutes. Point SC_IDS_WORK at a local disk if the repo sits on a synced folder.
+UNITS = os.environ.get("SC_IDS_WORK") or os.path.join(RESULTS, "00_units")

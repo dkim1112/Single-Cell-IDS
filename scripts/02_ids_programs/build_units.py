@@ -1,15 +1,20 @@
 """
 build_units.py — one QC'd file per blood lane and per skin sample (see sc_ids/units.py).
 
-Same filters as scripts/02_ids_programs/build_disease_object.py, applied per unit:
+FIRST STEP OF THE PIPELINE: every later script reads these files, one at a time, so memory is
+set by the largest single lane (about 1.5 GB) and not by how many lanes are used. The cells are
+exactly those of the merged objects this replaced (74,126 blood cells in the nine October lanes,
+67,367 skin cells; checked cell for cell).
+
+Filters, applied per unit:
   blood  source study's IncludedInStudy + demuxlet singlets, Status in Healthy/PSO/PSA,
          >= 200 genes, <= 10% mitochondrial, Platelet and Eryth cells removed
   skin   cells present in the source metadata, >= 200 genes, <= 10% mitochondrial
 Checkpointed: a unit that already has a file is skipped, so the script can be re-run until done.
 
-  python scripts/04_method_checks/build_units.py --tissue blood [--units PBMC-01-1,PBMC-03-1] [--budget 150]
-  python scripts/04_method_checks/build_units.py --tissue skin
-  python scripts/04_method_checks/build_units.py --tissue blood --index      # write cells_/genes_ tables
+  python scripts/02_ids_programs/build_units.py --tissue blood [--units PBMC-01-1,PBMC-03-1] [--budget 150]
+  python scripts/02_ids_programs/build_units.py --tissue skin
+  python scripts/02_ids_programs/build_units.py --tissue blood --index      # write cells_/genes_ tables
 """
 import argparse, glob, gzip, os, re, sys, time, resource
 import numpy as np, pandas as pd, scipy.sparse as sp
